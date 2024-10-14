@@ -27,7 +27,7 @@ def blackjack():
     playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
     dealerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
     print(f"Player Hand: {playerHand}")
-    print(f"DealerHand: {dealerHand[0]}")
+    print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
     # Check if dealers hand gives them blackjack
     # Check if player got blackjack
     gameOver = False
