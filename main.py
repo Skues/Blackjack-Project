@@ -23,55 +23,59 @@ def getBet():
 def blackjack():
     global pot
     shuffledDeck = shuffleDeck(createDeck())
-    bet = getBet()
-    playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
-    dealerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
-    print(f"Player Hand: {playerHand}")
-    print(f"Dealer Hand: {dealerHand}")
-    # print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
-    if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
-        print("PUSH")
-    elif blackjackCheck(dealerHand) == True:
-        print("Dealer wins")
-    elif blackjackCheck(playerHand) == True:
-        print("Player wins 3/2 payout")
-    else:
-        # Check if dealers hand gives them blackjack
-        # Check if player got blackjack
-        gameOver = False
-        while gameOver == False:
-            action = input("What would you like to do? ")
-            if action.upper() == "H":
-                playerHand.append(shuffledDeck.pop())
-                print(f"Player Hand: {playerHand}")
-                print(f"Player hand value: {handValue(playerHand)}")
-                if handValue(playerHand) > 21:
-                    print("Bust!")
-                    pot -= bet
-                    gameOver = True
-            elif action.upper() == "S":
-                print("dealers turn")
-                print(f"DealerHand: {dealerHand}")
-                while handValue(dealerHand) < 17:
-                    print("Dealer takes another card")
-                    dealerHand.append(shuffledDeck.pop())
+    play = "Y"
+    while play.upper() == "Y": 
+        bet = getBet()
+        playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
+        dealerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
+        print(f"Player Hand: {playerHand}")
+        print(f"Dealer Hand: {dealerHand}")
+        # print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
+        if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
+            print("PUSH")
+        elif blackjackCheck(dealerHand) == True:
+            print("Dealer wins")
+            pot -= bet
+        elif blackjackCheck(playerHand) == True:
+            print("Player wins 3/2 payout")
+            pot += bet*1.5
+        else:
+            gameOver = False
+            while gameOver == False:
+                action = input("What would you like to do? ")
+                if action.upper() == "H":
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    print(f"Player hand value: {handValue(playerHand)}")
+                    if handValue(playerHand) > 21:
+                        print("Bust!")
+                        pot -= bet
+                        gameOver = True
+                elif action.upper() == "S":
+                    print("dealers turn")
                     print(f"DealerHand: {dealerHand}")
-                if handValue(dealerHand) > 21:
-                    print("Dealer bust")
-                    pot += bet
-                    gameOver = True
-                elif handValue(dealerHand) == handValue(playerHand):
-                    print("PUSH")
-                    gameOver = True
-                elif handValue(dealerHand) > handValue(playerHand):
-                    print("DEALER WIN")
-                    pot -= bet
-                    gameOver = True
-                else:
-                    print("PLAYER WIN")
-                    pot += bet
-                    gameOver = True
-        print(f"Pot after hand: {pot}")
+                    while handValue(dealerHand) < 17:
+                        print("Dealer takes another card")
+                        dealerHand.append(shuffledDeck.pop())
+                        print(f"DealerHand: {dealerHand}")
+                    if handValue(dealerHand) > 21:
+                        print("Dealer bust")
+                        pot += bet
+                        gameOver = True
+                    elif handValue(dealerHand) == handValue(playerHand):
+                        print("PUSH")
+                        gameOver = True
+                    elif handValue(dealerHand) > handValue(playerHand):
+                        print("DEALER WIN")
+                        pot -= bet
+                        gameOver = True
+                    else:
+                        print("PLAYER WIN")
+                        pot += bet
+                        gameOver = True
+            print(f"Pot after hand: {pot}")
+        play = input("Do you want to play? Y/N ")
+    print(f"Pot after whole game: {pot}")
             
 
 def handValue(hand):
@@ -86,10 +90,12 @@ def handValue(hand):
     return total
 
 def blackjackCheck(hand):
-    if hand[0][0] == "J" or hand[0][0] == "Q" or hand[0][0] == "K" and hand[1][0] == "A":
-        return True
-    elif hand[0][0] == "A" and hand[0][0] == "J" or hand[0][0] == "Q" or hand[0][0] == "K":
-        return True
+    if hand[0][0] == "J" or hand[0][0] == "Q" or hand[0][0] == "K":
+        if hand[1][0] == "A":
+            return True
+    elif hand[0][0] == "A":
+        if hand[0][0] == "J" or hand[0][0] == "Q" or hand[0][0] == "K":
+            return True
     else:
         return False
 
