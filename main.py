@@ -18,10 +18,10 @@ def getBet():
         if bet > pot:
             print("You are betting more than you have, try again ")
         else:
-            var = pot - bet
             return bet
 
 def blackjack():
+    global pot
     shuffledDeck = shuffleDeck(createDeck())
     bet = getBet()
     playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
@@ -29,6 +29,7 @@ def blackjack():
     print(f"Player Hand: {playerHand}")
     print(f"DealerHand: {dealerHand[0]}")
     # Check if dealers hand gives them blackjack
+    # Check if player got blackjack
     gameOver = False
     while gameOver == False:
         action = input("What would you like to do? ")
@@ -36,25 +37,45 @@ def blackjack():
             playerHand.append(shuffledDeck.pop())
             print(f"Player Hand: {playerHand}")
             print(f"Player hand value: {handValue(playerHand)}")
+            if handValue(playerHand) > 21:
+                print("Bust!")
+                pot -= bet
+                gameOver = True
             # check if player hand value is greater than 21
         elif action.upper() == "S":
             print("dealers turn")
-            #check if dealers hand is less than 17 then hit till 17 or above
-            dealerHand.append(shuffledDeck.pop())
             print(f"DealerHand: {dealerHand}")
+            while handValue(dealerHand) < 17:
+                print("Dealer takes another card")
+                dealerHand.append(shuffledDeck.pop())
+                print(f"DealerHand: {dealerHand}")
+            if handValue(dealerHand) > 21:
+                print("Dealer bust")
+                pot += bet
+                gameOver = True
+            elif handValue(dealerHand) == handValue(playerHand):
+                print("PUSH")
+                gameOver = True
+            elif handValue(dealerHand) > handValue(playerHand):
+                print("DEALER WIN")
+                pot -= bet
+                gameOver = True
+            else:
+                print("PLAYER WIN")
+                pot += bet
+                gameOver = True
+    print(f"Pot after hand: {pot}")
+            
 
 def handValue(hand):
     total = 0
     for i in range (len(hand)):
         if hand[i][0] == "J" or hand[i][0] == "Q" or hand[i][0] == "K":
             total += 10
-            print(total)
         elif hand[i][0] == "A":
             total += 11
-            print(total)
         else:
             total += int(hand[i][0])
-            print(total)
     return total
 
 
