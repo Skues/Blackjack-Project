@@ -26,8 +26,13 @@ def blackjack():
     play = "Y"
     while play.upper() == "Y": 
         bet = getBet()
-        playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
-        dealerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
+        playerHand = []
+        dealerHand = []
+        # playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
+        # dealerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
+        for i in range(2):
+            playerHand.append(shuffledDeck.pop())
+            dealerHand.append(shuffledDeck.pop())
         print(f"Player Hand: {playerHand}")
         print(f"Dealer Hand: {dealerHand}")
         # print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
@@ -107,9 +112,14 @@ def blackjack():
                             gameOver = True
                 elif action.lower() == "split":
                     print("SPLIT")
+                    # create new player hand variable that gets second card appended to it
+                    # deal cards to split hands and play the game like normal for both hands
             print(f"Pot after hand: {pot}")
-        play = input("Do you want to play? Y/N ")
-    print(f"Pot after whole game: {pot}")
+        if pot > 0:
+            play = input("Do you want to play? Y/N ")
+        else:
+            print("Ran out of money")
+            play = "N"
             
 
 def handValue(hand):
