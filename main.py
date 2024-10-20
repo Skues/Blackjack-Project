@@ -33,17 +33,20 @@ def blackjack():
         # print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
         if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
             print("PUSH")
-        elif blackjackCheck(dealerHand) == True:
+        elif blackjackCheck(dealerHand):
             print("Dealer wins")
             pot -= bet
-        elif blackjackCheck(playerHand) == True:
+        elif blackjackCheck(playerHand):
             print("Player wins 3/2 payout")
             pot += bet*1.5
         else:
             gameOver = False
             while gameOver == False:
-                action = input("What would you like to do? ")
-                if action.upper() == "H":
+                if playerHand[0][0] == playerHand[1][0]:
+                    action = input("Hit, Stand, Split or Double? ")
+                else:
+                    action = input("Hit, Stand or Double")
+                if action.lower() == "hit":
                     playerHand.append(shuffledDeck.pop())
                     print(f"Player Hand: {playerHand}")
                     print(f"Player hand value: {handValue(playerHand)}")
@@ -51,7 +54,7 @@ def blackjack():
                         print("Bust!")
                         pot -= bet
                         gameOver = True
-                elif action.upper() == "S":
+                elif action.lower() == "stand":
                     print("dealers turn")
                     print(f"DealerHand: {dealerHand}")
                     while handValue(dealerHand) < 17:
@@ -73,6 +76,37 @@ def blackjack():
                         print("PLAYER WIN")
                         pot += bet
                         gameOver = True
+                elif action.lower() == "double":
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    if handValue(playerHand) > 21:
+                        print("Bust!")
+                        pot -= bet*2
+                        gameOver = True
+                    else:
+                        print("dealers turn")
+                        print(f"DealerHand: {dealerHand}")
+                        while handValue(dealerHand) < 17:
+                            print("Dealer takes another card")
+                            dealerHand.append(shuffledDeck.pop())
+                            print(f"DealerHand: {dealerHand}")
+                        if handValue(dealerHand) > 21:
+                            print("Dealer bust")
+                            pot += bet*2
+                            gameOver = True
+                        elif handValue(dealerHand) == handValue(playerHand):
+                            print("PUSH")
+                            gameOver = True
+                        elif handValue(dealerHand) > handValue(playerHand):
+                            print("DEALER WIN")
+                            pot -= bet*2
+                            gameOver = True
+                        else:
+                            print("PLAYER WIN")
+                            pot += bet*2
+                            gameOver = True
+                elif action.lower() == "split":
+                    print("SPLIT")
             print(f"Pot after hand: {pot}")
         play = input("Do you want to play? Y/N ")
     print(f"Pot after whole game: {pot}")
