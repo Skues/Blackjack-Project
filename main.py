@@ -34,8 +34,8 @@ def blackjack():
             playerHand.append(shuffledDeck.pop())
             dealerHand.append(shuffledDeck.pop())
         print(f"Player Hand: {playerHand}")
-        print(f"Dealer Hand: {dealerHand}")
-        # print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
+        # print(f"Dealer Hand: {dealerHand}")
+        print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
         if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
             print("PUSH")
         elif blackjackCheck(dealerHand):
@@ -112,6 +112,11 @@ def blackjack():
                             gameOver = True
                 elif action.lower() == "split":
                     print("SPLIT")
+                    playerHand2 = [playerHand.pop()]
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    playerHand2.append(shuffledDeck.pop())
+                    print(f"Split Player Hand: {playerHand2}")
                     # create new player hand variable that gets second card appended to it
                     # deal cards to split hands and play the game like normal for both hands
             print(f"Pot after hand: {pot}")
@@ -142,6 +147,8 @@ def blackjackCheck(hand):
             return True
     else:
         return False
+
+# def runHand(playerHand, dealerHand):
 
 
 blackjack()
