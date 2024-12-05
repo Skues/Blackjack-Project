@@ -33,6 +33,7 @@ def blackjack():
         for i in range(2):
             playerHand.append(shuffledDeck.pop())
             dealerHand.append(shuffledDeck.pop())
+        playerHand = [['4', 'of', 'Club'], ['4', 'of', 'Spade']]
         print(f"Player Hand: {playerHand}")
         # print(f"Dealer Hand: {dealerHand}")
         print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
@@ -42,16 +43,20 @@ def blackjack():
         elif blackjackCheck(dealerHand):
             print("Dealer wins, Blackjack")
             pot -= bet
+            play = input("Do you want to play? Y/N ")
         elif blackjackCheck(playerHand):
             print("Player wins 3/2 payout")
             pot += bet*1.5
+            play = input("Do you want to play? Y/N ")
             print(f"Pot: {pot}")
         else:
             print("HELLO")
             if playerHand[0][0] == playerHand[1][0]:
                 action = input("Hit, Stand, Split or Double? ")
-                if action.lower == "split":
-                    splitFunction
+                if action.lower() == "split":
+                    splitResult = splitFunction(playerHand, shuffledDeck, dealerHand)
+                    for result in splitResult:
+                        pot += bet*result
                 else:
                     pass
             else:
@@ -75,12 +80,13 @@ def blackjack():
                     else:
                         print("PLAYER WIN")
                         pot += bet*result
-                print(f"Pot after hand: {pot}")
-                if pot > 0:
-                    play = input("Do you want to play? Y/N ")
-                else:
-                    print("Ran out of money")
-                    play = "N"
+            print(f"Pot after hand: {pot}")
+            print(pot, result, bet)
+            if pot > 0:
+                play = input("Do you want to play? Y/N ")
+            else:
+                print("Ran out of money")
+                play = "N"
         #     gameOver = False
         #     while gameOver == False:
         #         if playerHand[0][0] == playerHand[1][0]:
@@ -173,13 +179,12 @@ def handValue(hand):
                 total += 1
             else:
                 total += 11
-            print(total)
         else:
             for j in range(len(hand)):
                 if hand[j][0] == "A" and total+int(hand[i][0]) > 21:
                     total += int(hand[i][0])-10
-                    print(total)
             total += int(hand[i][0])
+    print(total)
     return total
 
 def blackjackCheck(hand):
@@ -193,28 +198,44 @@ def blackjackCheck(hand):
         return False
 
 def playHand(playerHand, shuffledDeck):
+    counter = 0
     gameOver = False
     while gameOver == False:
-        action = input("Hit, Stand or Double? ")
-        if action.lower() == "hit":
-            playerHand.append(shuffledDeck.pop())
-            print(f"Player Hand: {playerHand}")
-            print(f"Player hand value: {handValue(playerHand)}")
-            if handValue(playerHand) > 21:
-                print("Bust!")
-                return -1
-        elif action.lower() == "stand":
-            return 0
-        elif action.lower() == "double":
-            playerHand.append(shuffledDeck.pop())
-            print(f"Player Hand: {playerHand}")
-            if handValue(playerHand) > 21:
-                print("Bust!")
-                return -2
-            else:
-                return 2
+        if counter == 0:
+            action = input("Hit, Stand or Double? ")
+            if action.lower() == "hit":
+                counter += 1
+                playerHand.append(shuffledDeck.pop())
+                print(f"Player Hand: {playerHand}")
+                print(f"Player hand value: {handValue(playerHand)}")
+                if handValue(playerHand) > 21:
+                    print("Bust!")
+                    return -1
+            elif action.lower() == "stand":
+                return 1
+            elif action.lower() == "double":
+                counter += 1
+                playerHand.append(shuffledDeck.pop())
+                print(f"Player Hand: {playerHand}")
+                if handValue(playerHand) > 21:
+                    print("Bust!")
+                    return -2
+                else:
+                    return 2
+        elif counter != 0:
+            action = input("Hit or Stand? ")
+            if action.lower() == "hit":
+                playerHand.append(shuffledDeck.pop())
+                print(f"Player Hand: {playerHand}")
+                print(f"Player hand value: {handValue(playerHand)}")
+                if handValue(playerHand) > 21:
+                    print("Bust!")
+                    return -1
+            elif action.lower() == "stand":
+                return 1
             
 def dealerPlay(dealerHand, shuffledDeck):
+    print(f"Dealers hand: {dealerHand}")
     while handValue(dealerHand) < 17:
         dealerHand.append(shuffledDeck.pop())
         print(f"Dealers hand: {dealerHand}")
@@ -293,12 +314,36 @@ def runHand(playerHand, dealerHand, shuffledDeck):
                     return splitFunction(playerHand, shuffledDeck, dealerHand)
 
 def splitFunction(playerHand, shuffledDeck, dealerHand):
+    print("HELLOOO")
+    total = []
     playerHand2 = [playerHand.pop()]
     playerHand.append(shuffledDeck.pop())
     print(f"Player Hand: {playerHand}")
     playerHand2.append(shuffledDeck.pop())
     print(f"Split Player Hand: {playerHand2}")
-    total = runHand(playerHand, dealerHand, shuffledDeck) + runHand(playerHand2, dealerHand, shuffledDeck)
+    result1 = playHand(playerHand, shuffledDeck)
+    result2 = playHand(playerHand2, shuffledDeck)
+    results = [result1, result2]
+    for result in results:
+        if result < 0:
+            total.append(result)
+        else:
+            print(handValue(dealerHand))
+            dealerPlay(dealerHand, shuffledDeck)
+            print(handValue(dealerHand))
+
+            if handValue(dealerHand) > 21:
+                print("Dealer bust")
+                total.append(1)
+            elif handValue(dealerHand) == handValue(playerHand):
+                print("PUSH")
+                total.append(0)
+            elif handValue(dealerHand) > handValue(playerHand):
+                print("DEALER WIN")
+                total.append(-1)
+            else:
+                print("PLAYER WIN")
+                total.append(1)
     return total
 
 blackjack()
