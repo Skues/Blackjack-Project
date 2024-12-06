@@ -17,6 +17,7 @@ def getBet():
         bet = int(input("How much will you bet? "))
         if bet > pot:
             print("You are betting more than you have, try again ")
+            bet = 0
         else:
             return bet
 
@@ -324,26 +325,32 @@ def splitFunction(playerHand, shuffledDeck, dealerHand):
     result1 = playHand(playerHand, shuffledDeck)
     result2 = playHand(playerHand2, shuffledDeck)
     results = [result1, result2]
-    for result in results:
+    playerHands = [playerHand, playerHand2]
+    print("RESULTS:" ,results)
+    for result, playerH in zip(results, playerHands):
+        print(f"Player Hand11111111111: {playerH}")
         if result < 0:
+            print(f"DEALER: {handValue(dealerHand)}")
+            print(f"PLAYER: {handValue(playerH)}")
             total.append(result)
         else:
-            print(handValue(dealerHand))
             dealerPlay(dealerHand, shuffledDeck)
-            print(handValue(dealerHand))
+            print(f"DEALER: {handValue(dealerHand)}")
+            print(f"PLAYER: {handValue(playerH)}")
 
             if handValue(dealerHand) > 21:
                 print("Dealer bust")
-                total.append(1)
-            elif handValue(dealerHand) == handValue(playerHand):
+                total.append(1*result)
+            elif handValue(dealerHand) == handValue(playerH):
                 print("PUSH")
                 total.append(0)
-            elif handValue(dealerHand) > handValue(playerHand):
+            elif handValue(dealerHand) > handValue(playerH):
                 print("DEALER WIN")
-                total.append(-1)
+                total.append(-1*result)
             else:
                 print("PLAYER WIN")
-                total.append(1)
+                total.append(1*result)
+    print(total)
     return total
 
 blackjack()
