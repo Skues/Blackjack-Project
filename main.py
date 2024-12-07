@@ -10,7 +10,6 @@ def shuffleDeck(deck):
     random.shuffle(deck)
     return deck
 
-
 def getBet():
     bet = 0
     while bet == 0:
@@ -21,7 +20,51 @@ def getBet():
         else:
             return bet
 
+
+def initialise_blackjack():
+    shuffledDeck = shuffleDeck(createDeck())
+    playerHand = []
+    dealerHand = []
+    for i in range(2):
+        playerHand.append(shuffledDeck.pop())
+        dealerHand.append(shuffledDeck.pop())
+    return playerHand, dealerHand, shuffledDeck
+
+def mimic_blackjack(playerHand, dealerHand, shuffledDeck):
+    if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
+        print("PUSH")
+        return 0
+    elif blackjackCheck(dealerHand):
+        print("Dealer wins, Blackjack")
+        return -1
+    elif blackjackCheck(playerHand):
+        print("Player wins 3/2 payout")
+        return 1.5
+    else:
+        playerHand = mimic_the_dealer(playerHand, shuffledDeck)
+        print("ONE", len(shuffledDeck))
+        dealerPlay(dealerHand, shuffledDeck)
+        print("TWO", len(shuffledDeck))
+        print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
+        if handValue(dealerHand) > 21:
+            print("Dealer bust")
+            return -1
+        elif handValue(playerHand) > 21:
+            print("Player bust")
+            return 1
+        elif handValue(dealerHand) == handValue(playerHand):
+            print("PUSH")
+            return 0
+        elif handValue(dealerHand) > handValue(playerHand):
+            print("DEALER WIN")
+            return -1
+        else:
+            print("PLAYER WIN")
+            return 1
+
 def blackjack():
+    result = 1
+    strategy = input("What strategy would you like to play? ")
     global pot
     shuffledDeck = shuffleDeck(createDeck())
     play = "Y"
@@ -31,10 +74,9 @@ def blackjack():
         dealerHand = []
         # playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
         # dealerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
-        for i in range(2):
-            playerHand.append(shuffledDeck.pop())
-            dealerHand.append(shuffledDeck.pop())
-        playerHand = [['4', 'of', 'Club'], ['4', 'of', 'Spade']]
+
+
+        #playerHand = [['4', 'of', 'Club'], ['4', 'of', 'Spade']]
         print(f"Player Hand: {playerHand}")
         # print(f"Dealer Hand: {dealerHand}")
         print(f"Dealer Hand: {dealerHand[0]}, HIDDEN CARD")
@@ -52,42 +94,50 @@ def blackjack():
             print(f"Pot: {pot}")
         else:
             print("HELLO")
-            if playerHand[0][0] == playerHand[1][0]:
-                action = input("Hit, Stand, Split or Double? ")
-                if action.lower() == "split":
-                    splitResult = splitFunction(playerHand, shuffledDeck, dealerHand)
-                    for result in splitResult:
-                        pot += bet*result
-                else:
-                    pass
-            else:
-                print("HELLO2")
-                result = playHand(playerHand, shuffledDeck)
-                if result < 0:
-                    pot += bet*result
-                else:   
-                    print(handValue(dealerHand))
-                    dealerPlay(dealerHand, shuffledDeck)
-                    print(handValue(dealerHand))
-                    
-                    if handValue(dealerHand) > 21:
-                        print("Dealer bust")
-                        pot += bet*result
-                    elif handValue(dealerHand) == handValue(playerHand):
-                        print("PUSH")
-                    elif handValue(dealerHand) > handValue(playerHand):
-                        print("DEALER WIN")
-                        pot -= bet*result
+            if strategy.lower() != "mimic_dealer":
+                if playerHand[0][0] == playerHand[1][0]:
+                    action = input("Hit, Stand, Split or Double? ")
+                    if action.lower() == "split":
+                        splitResult = splitFunction(playerHand, shuffledDeck, dealerHand)
+                        for result in splitResult:
+                            pot += bet*result
                     else:
-                        print("PLAYER WIN")
+                        pass
+                else:
+                    print("HELLO2")
+                    result = playHand(playerHand, shuffledDeck)
+                    if result < 0:
                         pot += bet*result
-            print(f"Pot after hand: {pot}")
-            print(pot, result, bet)
-            if pot > 0:
-                play = input("Do you want to play? Y/N ")
+                    else:
+                        print(handValue(dealerHand))
+                        dealerPlay(dealerHand, shuffledDeck)
+                        print(handValue(dealerHand))
             else:
-                print("Ran out of money")
-                play = "N"
+                print("Mimic the Dealer strategy: ")
+                playerHand = mimic_the_dealer(playerHand, shuffledDeck)
+                dealerPlay(dealerHand, shuffledDeck)
+                print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
+            if handValue(dealerHand) > 21:
+                print("Dealer bust")
+                pot += bet*result
+            elif handValue(playerHand) > 21:
+                print("Player bust")
+                pot -= bet*result
+            elif handValue(dealerHand) == handValue(playerHand):
+                print("PUSH")
+            elif handValue(dealerHand) > handValue(playerHand):
+                print("DEALER WIN")
+                pot -= bet*result
+            else:
+                print("PLAYER WIN")
+                pot += bet*result
+        print(f"Pot after hand: {pot}")
+        print(pot, result, bet)
+        if pot > 0:
+            play = input("Do you want to play? Y/N ")
+        else:
+            print("Ran out of money")
+            play = "N"
         #     gameOver = False
         #     while gameOver == False:
         #         if playerHand[0][0] == playerHand[1][0]:
@@ -168,26 +218,30 @@ def blackjack():
         # else:
         #     print("Ran out of money")
         #     play = "N"
-            
 
 def handValue(hand):
     total = 0
+    ace = 0
     for i in range (len(hand)):
         if hand[i][0] == "J" or hand[i][0] == "Q" or hand[i][0] == "K":
             total += 10
         elif hand[i][0] == "A":
-            if total+11 > 21:
-                total += 1
-            else:
-                total += 11
+            total += 11
+            ace += 1
         else:
-            for j in range(len(hand)):
-                if hand[j][0] == "A" and total+int(hand[i][0]) > 21:
-                    total += int(hand[i][0])-10
             total += int(hand[i][0])
-    print(total)
+    while total > 21 and ace > 0:
+        total -= 10
+        ace -= 1
     return total
-
+        # for j in range(len(hand)):
+        #     if hand[j][0] == "A" and total+int(hand[i][0]) > 21:
+        #         total += int(hand[i][0])-10
+        #         return total
+        #     else:
+        #         total += int(hand[i][0])
+        #         return total
+        # total += int(hand[i][0])
 def blackjackCheck(hand):
     if hand[0][0] == "J" or hand[0][0] == "Q" or hand[0][0] == "K" or hand[0][0] == "10":
         if hand[1][0] == "A":
@@ -211,7 +265,7 @@ def playHand(playerHand, shuffledDeck):
                 print(f"Player hand value: {handValue(playerHand)}")
                 if handValue(playerHand) > 21:
                     print("Bust!")
-                    return -1
+                    return 1
             elif action.lower() == "stand":
                 return 1
             elif action.lower() == "double":
@@ -353,7 +407,61 @@ def splitFunction(playerHand, shuffledDeck, dealerHand):
     print(total)
     return total
 
-blackjack()
+def mimic_the_dealer(playerHand, shuffledDeck):
+    print("FIRST", playerHand)
+    while handValue(playerHand) < 17:
+        print("MIMIC VALUE:", handValue(playerHand))
+        playerHand.append(shuffledDeck.pop())
+        print(playerHand)
+    return playerHand
 
+
+# ph, dh, d = initialise_blackjack()
+# results = []
+#
+# num = int(input("How many hands: "))
+#
+#     for i in range(num):
+#         result = mimic_blackjack(ph, dh, d)
+#         if result > 0:
+#             results.append("WIN")
+#         elif result < 0:
+#             results.append("LOSS")
+#         else:
+#             results.append("PUSH")
+#     print(results)
+# elif choice.lower() == "normal":
+#     blackjack()
+
+def main_mimic():
+    deck = shuffleDeck(createDeck())
+    results = []
+    num = int(input("How many hands: "))
+
+
+    for i in range(num):
+        print(f"Hand number: {i}")
+        if len(deck) < 10:
+            print("Reshuffling deck")
+            deck = shuffleDeck(createDeck())
+        playerHand = []
+        dealerHand = []
+        for j in range(2):
+            playerHand.append(deck.pop())
+            dealerHand.append(deck.pop())
+        result = mimic_blackjack(playerHand, dealerHand, deck)
+        if result > 0:
+            results.append("WIN")
+        elif result < 0:
+            results.append("LOSS")
+        else:
+            results.append("PUSH")
+    print(results)
+
+choice = input("Normal or Mimic The Dealer? ")
+if choice.lower() == "mimic":
+    main_mimic()
+elif choice.lower() == "normal":
+    blackjack()
 
 
