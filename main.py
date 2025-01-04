@@ -296,18 +296,166 @@ def mimic_the_dealer(playerHand, shuffledDeck):
     return playerHand
 
 def basic_strategy(playerHand, dealerCard, shuffledDeck):
-    # need a while loop that keeps checking if the hand are these values until a certain point
-    # check if player hand is hard or soft (no aces)
+    completed = False
     dealerValue = handValue(dealerCard)
-    if handValue(playerHand) > 16: # Stands on any value above 16, no matter what the dealers up card is
-        return 1
-    elif handValue(playerHand) in range(13,16) and dealerValue in range(2, 6):
-        return 1
-    elif handValue(playerHand) in range(13,16) and dealerValue in range(7, 11):
-        # hit
-        playerHand.append(shuffledDeck.pop())
-        print(f"Player Hand: {playerHand}")
-
+    # check if player hand is hard or soft (no aces)
+    if playerHand[0][0] == 'A' or playerHand[0][1] == 'A':
+        while completed == False:
+            if playerHand[0][0] == 'A':
+                if playerHand[1][0] == 9:
+                    # stand on 9
+                    return 1
+                elif playerHand[1][0] == 8 and dealerValue in [2, 3, 4, 5, 7, 8, 9, 10, 11]:
+                    #stand
+                    return 1
+                elif playerHand[1][0] == 8 and dealerValue == 6:
+                    #Double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand[1][0] == 7 and dealerValue in range(2, 6):
+                    # Double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand[1][0] == 7 and dealerValue in range(7, 8):
+                    # stand
+                    return 1
+                elif playerHand[1][0] == 7 and dealerValue in range(9, 11):
+                    # Hit 
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                elif playerHand[1][0] == 6 and dealerValue == 2:
+                    # hit
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                elif playerHand[1][0] == 6 and dealerValue in range(3, 4):
+                    # Double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand[1][0] in range(2, 6) and dealerValue in [2, 7, 8, 9, 10, 11]:
+                    # hit
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                elif playerHand[1][0] in range(2, 6) and dealerValue in range(5,6):
+                    # Double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand[1][0] in range(2, 5) and dealerValue in range(2,3):
+                    # hit
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                elif playerHand[1][0] in [4, 5] and dealerValue == 4:
+                    # double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand in [2, 3] and dealerValue == 4:
+                    # hit
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+            elif playerHand[1][0] == 'A':
+                if playerHand[0][0] == 9:
+                    # stand on 9
+                    return 1
+                elif playerHand[0][0] == 8 and dealerValue in [2, 3, 4, 5, 7, 8, 9, 10, 11]:
+                    #stand
+                    return 1
+                elif playerHand[0][0] == 8 and dealerValue == 6:
+                    #Double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand[0][0] == 7 and dealerValue in range(2, 6):
+                    # Double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand[0][0] == 7 and dealerValue in range(7, 8):
+                    # stand
+                    return 1
+                elif playerHand[0][0] == 7 and dealerValue in range(9, 11):
+                    # Hit 
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                elif playerHand[0][0] == 6 and dealerValue == 2:
+                    # hit
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                elif playerHand[0][0] == 6 and dealerValue in range(3, 4):
+                    # Double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand[0][0] in range(2, 6) and dealerValue in [2, 7, 8, 9, 10, 11]:
+                    # hit
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                elif playerHand[0][0] in range(2, 6) and dealerValue in range(5,6):
+                    # Double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand[0][0] in range(2, 5) and dealerValue in range(2,3):
+                    # hit
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                elif playerHand[0][0] in [4, 5] and dealerValue == 4:
+                    # double
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")
+                    completed = True
+                elif playerHand in [2, 3] and dealerValue == 4:
+                    # hit
+                    playerHand.append(shuffledDeck.pop())
+                    print(f"Player Hand: {playerHand}")          
+                
+    # need a while loop that keeps checking if the hand are these values until a certain point
+    completed = False
+    while completed == False:
+        if handValue(playerHand) > 16: # Stands on any value above 16, no matter what the dealers up card is
+            return 1
+        elif handValue(playerHand) in range(13,16) and dealerValue in range(2, 6):
+            return 1
+        elif handValue(playerHand) in range(13,16) and dealerValue in range(7, 11):
+            # hit
+            playerHand.append(shuffledDeck.pop())
+            print(f"Player Hand: {playerHand}")
+        elif handValue(playerHand) == 12 and dealerValue in [2, 3, 7, 8, 9, 10, 11]:
+            #hit
+            playerHand.append(shuffledDeck.pop())
+            print(f"Player Hand: {playerHand}")
+        elif handValue(playerHand) == 12 and dealerValue in range(4, 6):
+            return 1
+        elif handValue(playerHand) == 11:
+            # Double
+            playerHand.append(shuffledDeck.pop())
+            print(f"Player Hand: {playerHand}")
+            completed = True
+        elif handValue(playerHand) == 10 and dealerValue in range(2, 9):
+            # Double
+            playerHand.append(shuffledDeck.pop())
+            print(f"Player Hand: {playerHand}")
+            completed = True
+        elif handValue(playerHand) == 10 and dealerValue in range(10, 11):
+            # hit
+            playerHand.append(shuffledDeck.pop())
+            print(f"Player Hand: {playerHand}")
+        elif handValue(playerHand) == 9 and dealerValue in [2, 7, 8, 9, 10, 11]:
+            # hit
+            playerHand.append(shuffledDeck.pop())
+            print(f"Player Hand: {playerHand}")
+        elif handValue(playerHand) == 9 and dealerValue in range(3,6):
+            # double 
+            playerHand.append(shuffledDeck.pop())
+            print(f"Player Hand: {playerHand}")
+            completed = True
+        elif handValue(playerHand) == 8:
+            # hit 
+            playerHand.append(shuffledDeck.pop())
+            print(f"Player Hand: {playerHand}")
 
 
 # ph, dh, d = initialise_blackjack()
