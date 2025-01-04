@@ -61,6 +61,38 @@ def mimic_blackjack(playerHand, dealerHand, shuffledDeck):
             print("PLAYER WIN")
             return 1
 
+def never_bust_blackjack(playerHand, dealerHand, shuffledDeck):
+    if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
+        print("PUSH")
+        return 0
+    elif blackjackCheck(dealerHand):
+        print("Dealer wins, Blackjack")
+        return -1
+    elif blackjackCheck(playerHand):
+        print("Player wins 3/2 payout")
+        return 1.5
+    else:
+        playerHand = never_bust(playerHand, shuffledDeck)
+        if handValue(playerHand) > 21:
+            print("Player bust")
+            return -1
+        print("ONE", len(shuffledDeck))
+        dealerPlay(dealerHand, shuffledDeck)
+        print("TWO", len(shuffledDeck))
+        print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
+        if handValue(dealerHand) > 21:
+            print("Dealer bust")
+            return 1
+        elif handValue(dealerHand) == handValue(playerHand):
+            print("PUSH")
+            return 0
+        elif handValue(dealerHand) > handValue(playerHand):
+            print("DEALER WIN")
+            return -1
+        else:
+            print("PLAYER WIN")
+            return 1
+        
 def bs_blackjack(playerHand, dealerHand, shuffledDeck):
     if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
         print("PUSH")
@@ -295,20 +327,94 @@ def mimic_the_dealer(playerHand, shuffledDeck):
         print(playerHand)
     return playerHand
 
-def basic_strategy(playerHand, dealerCard, shuffledDeck):
-    # need a while loop that keeps checking if the hand are these values until a certain point
-    # check if player hand is hard or soft (no aces)
-    dealerValue = handValue(dealerCard)
-    if handValue(playerHand) > 16: # Stands on any value above 16, no matter what the dealers up card is
-        return 1
-    elif handValue(playerHand) in range(13,16) and dealerValue in range(2, 6):
-        return 1
-    elif handValue(playerHand) in range(13,16) and dealerValue in range(7, 11):
-        # hit
+def never_bust(playerHand, shuffledDeck):
+    while handValue(playerHand) < 12:
+        # hit on 11 and below
+        print(f"Never bust value: {handValue(playerHand)}")
         playerHand.append(shuffledDeck.pop())
-        print(f"Player Hand: {playerHand}")
+        print(playerHand)
+    return playerHand
 
 
+def basic_strategy(playerHand, dealerHand, shuffledDeck):
+   
+    print(type(handValue(playerHand)))
+    if dealerHand[0][0] in ['J', 'Q', 'K']:
+        dealerCard = 10
+    elif dealerHand[0][0] == 'A':
+        dealerCard = 11
+    else:
+        dealerCard = int(dealerHand[0][0])
+    print(f"Player Hand: {playerHand}")
+    print(f"Dealer Card: {dealerCard}")
+    hardHands = {
+        21: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        20: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        19: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        18: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        17: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        16: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        15: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        14: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        13: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        12: {2: "Hit", 3: "Hit", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        11: {2: "Double", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Double", 8: "Double", 9: "Double", 10: "Double", 11: "Double"},
+        10: {2: "Double", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Double", 8: "Double", 9: "Double", 10: "Hit", 11: "Hit"},
+        9: {2: "Hit", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        8: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Hit", 6: "Hit", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        7: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Hit", 6: "Hit", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        6: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Hit", 6: "Hit", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        5: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Hit", 6: "Hit", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        4: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Hit", 6: "Hit", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        3: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Hit", 6: "Hit", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        2: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Hit", 6: "Hit", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"}
+      }
+    
+    softHands = {
+        20: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        19: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Double", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        18: {2: "Double", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Stand", 8: "Stand", 9: "Hit", 10: "Hit", 11: "Hit"},
+        17: {2: "Hit", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        16: {2: "Hit", 3: "Hit", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        15: {2: "Hit", 3: "Hit", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        14: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        13: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"}
+    }
+
+    pairSplit = {
+        ('A', 'A'): {2: "Yes", 3: "Yes", 4: "Yes", 5: "Yes", 6: "Yes", 7: "Yes", 8: "Yes", 9: "Yes", 10: "Yes", 11: "Yes"},
+        ('K', 'K'): {2: "No", 3: "No", 4: "No", 5: "No", 6: "No", 7: "No", 8: "No", 9: "No", 10: "No", 11: "No"},
+        ('Q', 'Q'): {2: "No", 3: "No", 4: "No", 5: "No", 6: "No", 7: "No", 8: "No", 9: "No", 10: "No", 11: "No"},
+        ('J', 'J'): {2: "No", 3: "No", 4: "No", 5: "No", 6: "No", 7: "No", 8: "No", 9: "No", 10: "No", 11: "No"},
+        (10, 10): {2: "No", 3: "No", 4: "No", 5: "No", 6: "No", 7: "No", 8: "No", 9: "No", 10: "No", 11: "No"},
+        (9, 9): {2: "Yes", 3: "Yes", 4: "Yes", 5: "Yes", 6: "Yes", 7: "No", 8: "Yes", 9: "Yes", 10: "No", 11: "No"},
+        (8, 8): {2: "Yes", 3: "Yes", 4: "Yes", 5: "Yes", 6: "Yes", 7: "Yes", 8: "Yes", 9: "Yes", 10: "Yes", 11: "Yes"},
+        (7, 7): {2: "Yes", 3: "Yes", 4: "Yes", 5: "Yes", 6: "Yes", 7: "Yes", 8: "No", 9: "No", 10: "No", 11: "No"},
+        (6, 6): {2: "No", 3: "Yes", 4: "Yes", 5: "Yes", 6: "Yes", 7: "No", 8: "No", 9: "No", 10: "No", 11: "No"},
+        (5, 5): {2: "No", 3: "No", 4: "No", 5: "No", 6: "No", 7: "No", 8: "No", 9: "No", 10: "No", 11: "No"},
+        (4, 4): {2: "No", 3: "No", 4: "No", 5: "No", 6: "No", 7: "No", 8: "No", 9: "No", 10: "No", 11: "No"},
+        (3, 3): {2: "No", 3: "No", 4: "Yes", 5: "Yes", 6: "Yes", 7: "Yes", 8: "No", 9: "No", 10: "No", 11: "No"},
+        (2, 2): {2: "No", 3: "No", 4: "Yes", 5: "Yes", 6: "Yes", 7: "Yes", 8: "No", 9: "No", 10: "No", 11: "No"}
+    }
+
+
+    # initially check for blackjack (maybe in the function before)
+    # then check for a pair, deal with the pair
+    # then check if an there is an ace in either of the two cards then use soft totals
+    # if not then use hard totals
+
+    if playerHand[0][0] == playerHand[1][0]:
+        action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard)
+        print(action)
+    else:
+        if playerHand[0][0] == 'A' or playerHand[1][0] == 'A':
+            action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+            print(action)
+        else:
+            action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+            print(action)
+
+    
 
 # ph, dh, d = initialise_blackjack()
 # results = []
@@ -351,6 +457,30 @@ def main_mimic():
             results.append("PUSH")
     print(results)
 
+def main_never_bust():
+    deck = shuffleDeck(createDeck())
+    results = []
+    num = int(input("How many hands: "))
+
+    for i in range(num):
+        print(f"Hand number: {i}")
+        if len(deck) < 10:
+            print("Reshuffling deck")
+            deck = shuffleDeck(createDeck())
+        playerHand = []
+        dealerHand = []
+        for j in range(2):
+            playerHand.append(deck.pop())
+            dealerHand.append(deck.pop())
+        result = never_bust_blackjack(playerHand, dealerHand, deck)
+        if result > 0:
+            results.append("WIN")
+        elif result < 0:
+            results.append("LOSS")
+        else:
+            results.append("PUSH")
+    print(results)
+
 def basic_strategy_main():
     deck = shuffleDeck(createDeck())
     results = []
@@ -365,7 +495,7 @@ def basic_strategy_main():
         for j in range(2):
             playerHand.append(deck.pop())
             dealerHand.append(deck.pop())
-        result = bs_blackjack(playerHand, dealerHand, deck)
+        result = basic_strategy(playerHand, dealerHand, deck)
         if result > 0:
             results.append("WIN")
         elif result < 0:
@@ -373,9 +503,14 @@ def basic_strategy_main():
         else:
             results.append("PUSH")
     print(results)
-choice = input("Normal or Mimic The Dealer? ")
+
+choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
 if choice.lower() == "mimic":
     main_mimic()
+elif choice.lower() == "never":
+    main_never_bust()
+elif choice.lower() == "basic":
+    basic_strategy_main()
 elif choice.lower() == "normal":
     blackjack()
 
