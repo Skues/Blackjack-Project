@@ -20,7 +20,6 @@ def getBet():
         else:
             return bet
 
-
 def initialise_blackjack():
     shuffledDeck = shuffleDeck(createDeck())
     playerHand = []
@@ -42,15 +41,47 @@ def mimic_blackjack(playerHand, dealerHand, shuffledDeck):
         return 1.5
     else:
         playerHand = mimic_the_dealer(playerHand, shuffledDeck)
+        if handValue(playerHand) > 21:
+            print("Player bust")
+            return -1
         print("ONE", len(shuffledDeck))
         dealerPlay(dealerHand, shuffledDeck)
         print("TWO", len(shuffledDeck))
         print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
             print("Dealer bust")
+            return 1
+        elif handValue(dealerHand) == handValue(playerHand):
+            print("PUSH")
+            return 0
+        elif handValue(dealerHand) > handValue(playerHand):
+            print("DEALER WIN")
             return -1
-        elif handValue(playerHand) > 21:
+        else:
+            print("PLAYER WIN")
+            return 1
+
+def bs_blackjack(playerHand, dealerHand, shuffledDeck):
+    if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
+        print("PUSH")
+        return 0
+    elif blackjackCheck(dealerHand):
+        print("Dealer wins, Blackjack")
+        return -1
+    elif blackjackCheck(playerHand):
+        print("Player wins 3/2 payout")
+        return 1.5
+    else:
+        playerHand = basic_strategy(playerHand, dealerHand[0], shuffledDeck)
+        if handValue(playerHand) > 21:
             print("Player bust")
+            return -1
+        print("ONE", len(shuffledDeck))
+        dealerPlay(dealerHand, shuffledDeck)
+        print("TWO", len(shuffledDeck))
+        print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
+        if handValue(dealerHand) > 21:
+            print("Dealer bust")
             return 1
         elif handValue(dealerHand) == handValue(playerHand):
             print("PUSH")
@@ -138,86 +169,7 @@ def blackjack():
         else:
             print("Ran out of money")
             play = "N"
-        #     gameOver = False
-        #     while gameOver == False:
-        #         if playerHand[0][0] == playerHand[1][0]:
-        #             action = input("Hit, Stand, Split or Double? ")
-        #         else:
-        #             action = input("Hit, Stand or Double")
-        #         if action.lower() == "hit":
-        #             playerHand.append(shuffledDeck.pop())
-        #             print(f"Player Hand: {playerHand}")
-        #             print(f"Player hand value: {handValue(playerHand)}")
-        #             if handValue(playerHand) > 21:
-        #                 print("Bust!")
-        #                 pot -= bet
-        #                 gameOver = True
-        #         elif action.lower() == "stand":
-        #             print("dealers turn")
-        #             print(f"DealerHand: {dealerHand}")
-        #             while handValue(dealerHand) < 17:
-        #                 print("Dealer takes another card")
-        #                 dealerHand.append(shuffledDeck.pop())
-        #                 print(f"DealerHand: {dealerHand}")
-        #             if handValue(dealerHand) > 21:
-        #                 print("Dealer bust")
-        #                 pot += bet
-        #                 gameOver = True
-        #             elif handValue(dealerHand) == handValue(playerHand):
-        #                 print("PUSH")
-        #                 gameOver = True
-        #             elif handValue(dealerHand) > handValue(playerHand):
-        #                 print("DEALER WIN")
-        #                 pot -= bet
-        #                 gameOver = True
-        #             else:
-        #                 print("PLAYER WIN")
-        #                 pot += bet
-        #                 gameOver = True
-        #         elif action.lower() == "double":
-        #             playerHand.append(shuffledDeck.pop())
-        #             print(f"Player Hand: {playerHand}")
-        #             if handValue(playerHand) > 21:
-        #                 print("Bust!")
-        #                 pot -= bet*2
-        #                 gameOver = True
-        #             else:
-        #                 print("dealers turn")
-        #                 print(f"DealerHand: {dealerHand}")
-        #                 while handValue(dealerHand) < 17:
-        #                     print("Dealer takes another card")
-        #                     dealerHand.append(shuffledDeck.pop())
-        #                     print(f"DealerHand: {dealerHand}")
-        #                 if handValue(dealerHand) > 21:
-        #                     print("Dealer bust")
-        #                     pot += bet*2
-        #                     gameOver = True
-        #                 elif handValue(dealerHand) == handValue(playerHand):
-        #                     print("PUSH")
-        #                     gameOver = True
-        #                 elif handValue(dealerHand) > handValue(playerHand):
-        #                     print("DEALER WIN")
-        #                     pot -= bet*2
-        #                     gameOver = True
-        #                 else:
-        #                     print("PLAYER WIN")
-        #                     pot += bet*2
-        #                     gameOver = True
-        #         elif action.lower() == "split":
-        #             print("SPLIT")
-        #             playerHand2 = [playerHand.pop()]
-        #             playerHand.append(shuffledDeck.pop())
-        #             print(f"Player Hand: {playerHand}")
-        #             playerHand2.append(shuffledDeck.pop())
-        #             print(f"Split Player Hand: {playerHand2}")
-        #             # create new player hand variable that gets second card appended to it
-        #             # deal cards to split hands and play the game like normal for both hands
-        #     print(f"Pot after hand: {pot}")
-        # if pot > 0:
-        #     play = input("Do you want to play? Y/N ")
-        # else:
-        #     print("Ran out of money")
-        #     play = "N"
+
 
 def handValue(hand):
     total = 0
@@ -296,78 +248,6 @@ def dealerPlay(dealerHand, shuffledDeck):
         print(f"Dealers hand: {dealerHand}")
 
 
-def runHand(playerHand, dealerHand, shuffledDeck):
-    print(f"player hand = {playerHand}, dealer hand = {dealerHand}")
-    if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
-            print("PUSH")
-            return 0
-    elif blackjackCheck(dealerHand):
-        print("Dealer wins")
-        return -1
-    elif blackjackCheck(playerHand):
-        print("Player wins 3/2 payout")
-        return 1.5
-    else:
-        gameOver = False
-        while gameOver == False:
-            if playerHand[0][0] == playerHand[1][0]:
-                action = input("Hit, Stand, Split or Double? ")
-            else:
-                action = input("Hit, Stand or Double? ")
-            if action.lower() == "hit":
-                playerHand.append(shuffledDeck.pop())
-                print(f"Player Hand: {playerHand}")
-                print(f"Player hand value: {handValue(playerHand)}")
-                if handValue(playerHand) > 21:
-                    print("Bust!")
-                    return -1
-            elif action.lower() == "stand":
-                print("dealers turn")
-                print(f"DealerHand: {dealerHand}")
-                while handValue(dealerHand) < 17:
-                    print("Dealer takes another card")
-                    dealerHand.append(shuffledDeck.pop())
-                    print(f"DealerHand: {dealerHand}")
-                if handValue(dealerHand) > 21:
-                    print("Dealer bust")
-                    return 1
-                elif handValue(dealerHand) == handValue(playerHand):
-                    print("PUSH")
-                    return 0
-                elif handValue(dealerHand) > handValue(playerHand):
-                    print("DEALER WIN")
-                    return -1
-                else:
-                    print("PLAYER WIN")
-                    return 1
-            elif action.lower() == "double":
-                playerHand.append(shuffledDeck.pop())
-                print(f"Player Hand: {playerHand}")
-                if handValue(playerHand) > 21:
-                    print("Bust!")
-                    return -2
-                else:
-                    print("dealers turn")
-                    print(f"DealerHand: {dealerHand}")
-                    while handValue(dealerHand) < 17:
-                        print("Dealer takes another card")
-                        dealerHand.append(shuffledDeck.pop())
-                        print(f"DealerHand: {dealerHand}")
-                    if handValue(dealerHand) > 21:
-                        print("Dealer bust")
-                        return 2
-                    elif handValue(dealerHand) == handValue(playerHand):
-                        print("PUSH")
-                        return 0
-                    elif handValue(dealerHand) > handValue(playerHand):
-                        print("DEALER WIN")
-                        return -2
-                    else:
-                        print("PLAYER WIN")
-                        return 2
-            elif action.lower() == "split":
-                    return splitFunction(playerHand, shuffledDeck, dealerHand)
-
 def splitFunction(playerHand, shuffledDeck, dealerHand):
     print("HELLOOO")
     total = []
@@ -415,6 +295,20 @@ def mimic_the_dealer(playerHand, shuffledDeck):
         print(playerHand)
     return playerHand
 
+def basic_strategy(playerHand, dealerCard, shuffledDeck):
+    # need a while loop that keeps checking if the hand are these values until a certain point
+    # check if player hand is hard or soft (no aces)
+    dealerValue = handValue(dealerCard)
+    if handValue(playerHand) > 16: # Stands on any value above 16, no matter what the dealers up card is
+        return 1
+    elif handValue(playerHand) in range(13,16) and dealerValue in range(2, 6):
+        return 1
+    elif handValue(playerHand) in range(13,16) and dealerValue in range(7, 11):
+        # hit
+        playerHand.append(shuffledDeck.pop())
+        print(f"Player Hand: {playerHand}")
+
+
 
 # ph, dh, d = initialise_blackjack()
 # results = []
@@ -438,7 +332,6 @@ def main_mimic():
     results = []
     num = int(input("How many hands: "))
 
-
     for i in range(num):
         print(f"Hand number: {i}")
         if len(deck) < 10:
@@ -458,6 +351,28 @@ def main_mimic():
             results.append("PUSH")
     print(results)
 
+def basic_strategy_main():
+    deck = shuffleDeck(createDeck())
+    results = []
+    num = int(input("How many hands: "))
+    for i in range(num):
+        print(f"Hand number: {i}")
+        if len(deck) < 10:
+            print("Reshuffling deck")
+            deck = shuffleDeck(createDeck())
+        playerHand = []
+        dealerHand = []
+        for j in range(2):
+            playerHand.append(deck.pop())
+            dealerHand.append(deck.pop())
+        result = bs_blackjack(playerHand, dealerHand, deck)
+        if result > 0:
+            results.append("WIN")
+        elif result < 0:
+            results.append("LOSS")
+        else:
+            results.append("PUSH")
+    print(results)
 choice = input("Normal or Mimic The Dealer? ")
 if choice.lower() == "mimic":
     main_mimic()
