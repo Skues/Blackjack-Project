@@ -327,7 +327,6 @@ def mimic_the_dealer(playerHand, shuffledDeck):
         print(playerHand)
     return playerHand
 
-<<<<<<< HEAD
 def never_bust(playerHand, shuffledDeck):
     while handValue(playerHand) < 12:
         # hit on 11 and below
