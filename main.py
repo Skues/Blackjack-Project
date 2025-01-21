@@ -105,6 +105,7 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck):
         return 1.5
     else:
         playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck)
+        print(playerHand, mult)
         if mult < 0:
             print("Player bust")
             return -1
@@ -401,16 +402,27 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
     # then check for a pair, deal with the pair
     # then check if an there is an ace in either of the two cards then use soft totals
     # if not then use hard totals
-
+    counter = 0
     completed = False
     while completed == False:
         if handValue(playerHand) > 21:
-            completed = False
+            completed = True
             return playerHand, -1
         else:
-            if playerHand[0][0] == playerHand[1][0]:
-                action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard)
+            if playerHand[0][0] == playerHand[1][0] and counter == 0:
+                playerHands = [0, 0]
+                for i in range(len(playerHand)):
+                    if playerHand[i][0] in ['J', 'Q', 'K']:
+                        playerHands[i] = 10
+                    elif playerHand[i][0] == 'A':
+                        playerHands[i] = 11
+                    else:
+                        playerHands[i] = int(playerHand[i][0])
+                action = pairSplit.get((playerHands[0], playerHands[1])).get(dealerCard)
                 print(action)
+                if action == "Yes":
+                    counter += 1
+                    return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
                 pass
             else:
                 if playerHand[0][0] == 'A' or playerHand[1][0] == 'A':
@@ -445,7 +457,19 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
                         completed = True
                         return playerHand, 1
 
+def bs_split(playerHand, dealerHand, shuffledDeck):
+    playerHand2 = [playerHand.pop()]
+    playerHand.append(shuffledDeck.pop())
+    playerHand2.append(shuffledDeck.pop())
+    result1 = basic_strategy(playerHand, dealerHand, shuffledDeck)
+    result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck)
+
+    total = result1 + result2
+
+    return total
+
     
+
 
 # ph, dh, d = initialise_blackjack()
 # results = []
