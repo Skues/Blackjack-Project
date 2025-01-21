@@ -104,8 +104,8 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck):
         print("Player wins 3/2 payout")
         return 1.5
     else:
-        playerHand = basic_strategy(playerHand, dealerHand[0], shuffledDeck)
-        if handValue(playerHand) > 21:
+        playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck)
+        if mult < 0:
             print("Player bust")
             return -1
         print("ONE", len(shuffledDeck))
@@ -114,16 +114,16 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck):
         print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
             print("Dealer bust")
-            return 1
+            return 1*mult
         elif handValue(dealerHand) == handValue(playerHand):
             print("PUSH")
             return 0
         elif handValue(dealerHand) > handValue(playerHand):
             print("DEALER WIN")
-            return -1
+            return -1*mult
         else:
             print("PLAYER WIN")
-            return 1
+            return 1*mult
 
 def blackjack():
     result = 1
@@ -402,16 +402,48 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
     # then check if an there is an ace in either of the two cards then use soft totals
     # if not then use hard totals
 
-    if playerHand[0][0] == playerHand[1][0]:
-        action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard)
-        print(action)
-    else:
-        if playerHand[0][0] == 'A' or playerHand[1][0] == 'A':
-            action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
-            print(action)
+    completed = False
+    while completed == False:
+        if handValue(playerHand) > 21:
+            completed = False
+            return playerHand, -1
         else:
-            action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
-            print(action)
+            if playerHand[0][0] == playerHand[1][0]:
+                action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard)
+                print(action)
+                pass
+            else:
+                if playerHand[0][0] == 'A' or playerHand[1][0] == 'A':
+                    action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+                    print(action)
+                    if action == "Hit":
+                        playerHand.append(shuffledDeck.pop())
+                        print(f"AFTER HIT: {playerHand}")
+                    elif action == "Double":
+                        playerHand.append(shuffledDeck.pop())
+                        completed = True
+                        return playerHand, 2
+                    elif action == "Stand":
+                        completed = True
+                        print("STAND")
+                        print(playerHand, "STANDING")
+                        return playerHand, 1
+                else:
+                    action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+                    print(action)
+                    if action == "Hit":
+                        playerHand.append(shuffledDeck.pop())
+                        print(f"AFTER HIT: {playerHand}")
+                    elif action == "Double":
+                        playerHand.append(shuffledDeck.pop())
+                        print(f"AFTER DOUBLE: {playerHand}")
+                        completed = True
+                        return playerHand, 2
+                    elif action == "Stand":
+                        print(f"AFTER STAND: {playerHand}")
+
+                        completed = True
+                        return playerHand, 1
 
     
 
@@ -494,9 +526,13 @@ def basic_strategy_main():
         for j in range(2):
             playerHand.append(deck.pop())
             dealerHand.append(deck.pop())
-        result = basic_strategy(playerHand, dealerHand, deck)
-        if result > 0:
+        result = bs_blackjack(playerHand, dealerHand, deck)
+        if result > 1:
+            results.append("D WIN")
+        elif result > 0:
             results.append("WIN")
+        elif result < -1:
+            results.append("D LOSS")
         elif result < 0:
             results.append("LOSS")
         else:
