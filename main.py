@@ -371,6 +371,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
       }
     
     softHands = {
+        21: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
         20: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
         19: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Double", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
         18: {2: "Double", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Stand", 8: "Stand", 9: "Hit", 10: "Hit", 11: "Hit"},
@@ -379,6 +380,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
         15: {2: "Hit", 3: "Hit", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
         14: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
         13: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"}
+        # SOFT hands only count on the first two cards so (A, 2) or (A, 9) not having multiple cards with an ace??
     }
 
     pairSplit = {
@@ -408,61 +410,74 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
         if handValue(playerHand) > 21:
             completed = True
             return playerHand, -1
-        else:
-            if playerHand[0][0] == playerHand[1][0] and counter == 0:
-                playerHands = [0, 0]
-                for i in range(len(playerHand)):
-                    if playerHand[i][0] in ['J', 'Q', 'K']:
-                        playerHands[i] = 10
-                    elif playerHand[i][0] == 'A':
-                        playerHands[i] = 11
-                    else:
-                        playerHands[i] = int(playerHand[i][0])
-                action = pairSplit.get((playerHands[0], playerHands[1])).get(dealerCard)
-                print(action)
-                if action == "Yes":
-                    counter += 1
-                    return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
-                pass
-            else:
-                if playerHand[0][0] == 'A' or playerHand[1][0] == 'A':
-                    action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
-                    print(action)
-                    if action == "Hit":
-                        playerHand.append(shuffledDeck.pop())
-                        print(f"AFTER HIT: {playerHand}")
-                    elif action == "Double":
-                        playerHand.append(shuffledDeck.pop())
-                        completed = True
-                        return playerHand, 2
-                    elif action == "Stand":
-                        completed = True
-                        print("STAND")
-                        print(playerHand, "STANDING")
-                        return playerHand, 1
+        if playerHand[0][0] == playerHand[1][0] and counter == 0:
+            playerHands = [0, 0]
+            for i in range(len(playerHand)):
+                if isinstance(int(playerHand[i][0]), int):
+                    playerHands[i] = int(playerHand[i][0]) 
                 else:
-                    action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
-                    print(action)
-                    if action == "Hit":
-                        playerHand.append(shuffledDeck.pop())
-                        print(f"AFTER HIT: {playerHand}")
-                    elif action == "Double":
-                        playerHand.append(shuffledDeck.pop())
-                        print(f"AFTER DOUBLE: {playerHand}")
-                        completed = True
-                        return playerHand, 2
-                    elif action == "Stand":
-                        print(f"AFTER STAND: {playerHand}")
+                    playerHands[i] = playerHand[i][0]
+            #     if playerHand[i][0] in ['J', 'Q', 'K']:
+            #         playerHands[i] = 10
+            #     elif playerHand[i][0] == 'A':
+            #         playerHands[i] = 11
+            #     else:
+            #         playerHands[i] = int(playerHand[i][0])
+            print(playerHand)
+            action = pairSplit.get((playerHands[0], playerHands[1])).get(dealerCard, "dk")
+            print(action)
+            if action == "dk":
+                print(f"DK ERROR: {playerHand} and {dealerCard}")
+                break
+            if action == "Yes":
+                print("SPLITTT")
+                counter += 1
+                return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
+            counter += 1
+        if playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
+            action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+            if action == "dk":
+                print(f"DK ERROR: {playerHand} and {dealerCard}")
+                break
+            print(action)
+            if action == "Hit":
+                playerHand.append(shuffledDeck.pop())
+                print(f"AFTER HIT: {playerHand}")
+            elif action == "Double":
+                playerHand.append(shuffledDeck.pop())
+                completed = True
+                return playerHand, 2
+            elif action == "Stand":
+                completed = True
+                print("STAND")
+                print(playerHand, "STANDING")
+                return playerHand, 1
+        else:
+            action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+            if action == "dk":
+                print(f"DK ERROR: {playerHand} and {dealerCard}")
+                break
+            print(action)
+            if action == "Hit":
+                playerHand.append(shuffledDeck.pop())
+                print(f"AFTER HIT: {playerHand}")
+            elif action == "Double":
+                playerHand.append(shuffledDeck.pop())
+                print(f"AFTER DOUBLE: {playerHand}")
+                completed = True
+                return playerHand, 2
+            elif action == "Stand":
+                print(f"AFTER STAND: {playerHand}")
 
-                        completed = True
-                        return playerHand, 1
+                completed = True
+                return playerHand, 1
 
 def bs_split(playerHand, dealerHand, shuffledDeck):
     playerHand2 = [playerHand.pop()]
     playerHand.append(shuffledDeck.pop())
     playerHand2.append(shuffledDeck.pop())
-    result1 = basic_strategy(playerHand, dealerHand, shuffledDeck)
-    result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck)
+    hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck)
+    hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck)
 
     total = result1 + result2
 
