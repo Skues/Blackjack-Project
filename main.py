@@ -3,7 +3,7 @@ import random
 pot = 100
 def createDeck():
     suits = ['Heart', 'Diamond', 'Spade', 'Club']
-    ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+    ranks = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"]
     return [[rank, "of", suit] for suit in suits for rank in ranks]
 
 def shuffleDeck(deck):
@@ -371,15 +371,15 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
       }
     
     softHands = {
-        21: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
-        20: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
-        19: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Double", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
-        18: {2: "Double", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Stand", 8: "Stand", 9: "Hit", 10: "Hit", 11: "Hit"},
-        17: {2: "Hit", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
-        16: {2: "Hit", 3: "Hit", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
-        15: {2: "Hit", 3: "Hit", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
-        14: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
-        13: {2: "Hit", 3: "Hit", 4: "Hit", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"}
+        ('A', 10): {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        ('A', 9): {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        ('A', 8): {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Double", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
+        ('A', 7): {2: "Double", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Stand", 8: "Stand", 9: "Hit", 10: "Hit", 11: "Hit"},
+        ('A', 6): {2: "Hit", 3: "Double", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        ('A', 5): {2: "Hit", 3: "Hit", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        ('A', 4): {2: "Hit", 3: "Hit", 4: "Double", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        ('A', 3): {2: "Hit", 3: "Hit", 4: "Hit", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"},
+        ('A', 2): {2: "Hit", 3: "Hit", 4: "Hit", 5: "Double", 6: "Double", 7: "Hit", 8: "Hit", 9: "Hit", 10: "Hit", 11: "Hit"}
         # SOFT hands only count on the first two cards so (A, 2) or (A, 9) not having multiple cards with an ace??
     }
 
@@ -411,12 +411,14 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
             completed = True
             return playerHand, -1
         if playerHand[0][0] == playerHand[1][0] and counter == 0:
-            playerHands = [0, 0]
-            for i in range(len(playerHand)):
-                if isinstance(int(playerHand[i][0]), int):
-                    playerHands[i] = int(playerHand[i][0]) 
-                else:
-                    playerHands[i] = playerHand[i][0]
+            print("PAIR")
+            # playerHands = [0, 0]
+            # for i in range(len(playerHand)):
+            #     if 
+            #     if isinstance(int(playerHand[i][0]), int):
+            #         playerHands[i] = int(playerHand[i][0]) 
+            #     else:
+            #         playerHands[i] = playerHand[i][0]
             #     if playerHand[i][0] in ['J', 'Q', 'K']:
             #         playerHands[i] = 10
             #     elif playerHand[i][0] == 'A':
@@ -424,7 +426,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
             #     else:
             #         playerHands[i] = int(playerHand[i][0])
             print(playerHand)
-            action = pairSplit.get((playerHands[0], playerHands[1])).get(dealerCard, "dk")
+            action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
             print(action)
             if action == "dk":
                 print(f"DK ERROR: {playerHand} and {dealerCard}")
@@ -434,8 +436,20 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
                 counter += 1
                 return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
             counter += 1
-        if playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
-            action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+        if handType(playerHand) == "soft" and playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
+            print("SOFT")
+            print(handType(playerHand))
+            temp = ""
+            for i in range(len(playerHand)):
+                print(len(playerHand))
+                if playerHand[i][0] == 'A':
+                    print("YEP")
+                    temp = playerHand.pop(i)
+                    print(temp, playerHand)
+                    break
+            playerHand.insert(0, temp)
+            action = softHands.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
+            # action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
             if action == "dk":
                 print(f"DK ERROR: {playerHand} and {dealerCard}")
                 break
@@ -453,6 +467,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
                 print(playerHand, "STANDING")
                 return playerHand, 1
         else:
+            print("HARD")
             action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
             if action == "dk":
                 print(f"DK ERROR: {playerHand} and {dealerCard}")
@@ -484,7 +499,23 @@ def bs_split(playerHand, dealerHand, shuffledDeck):
     return total
 
     
-
+def handType(hand):
+    total = 0
+    ace = 0
+    for i in range (len(hand)):
+        if hand[i][0] == "J" or hand[i][0] == "Q" or hand[i][0] == "K":
+            total += 10
+        elif hand[i][0] == "A":
+            total += 11
+            ace += 1
+        else:
+            total += int(hand[i][0])
+    while ace > 0:
+        print(total, total+10)
+        if total > 21:
+            return "hard"
+        else:
+            return "soft"
 
 # ph, dh, d = initialise_blackjack()
 # results = []
@@ -553,7 +584,8 @@ def main_never_bust():
 
 def basic_strategy_main():
     deck = shuffleDeck(createDeck())
-    results = []
+    # results = []
+    results = 0
     num = int(input("How many hands: "))
     for i in range(num):
         print(f"Hand number: {i}")
@@ -566,16 +598,17 @@ def basic_strategy_main():
             playerHand.append(deck.pop())
             dealerHand.append(deck.pop())
         result = bs_blackjack(playerHand, dealerHand, deck)
-        if result > 1:
-            results.append("D WIN")
-        elif result > 0:
-            results.append("WIN")
-        elif result < -1:
-            results.append("D LOSS")
-        elif result < 0:
-            results.append("LOSS")
-        else:
-            results.append("PUSH")
+        results += result
+        # if result > 1:
+        #     results.append("D WIN")
+        # elif result > 0:
+        #     results.append("WIN")
+        # elif result < -1:
+        #     results.append("D LOSS")
+        # elif result < 0:
+        #     results.append("LOSS")
+        # else:
+        #     results.append("PUSH")
     print(results)
 
 choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
