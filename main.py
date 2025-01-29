@@ -139,8 +139,8 @@ def blackjack():
         bet = getBet()
         playerHand = []
         dealerHand = []
-        # playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
-        # dealerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
+        playerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
+        dealerHand = [shuffledDeck.pop(), shuffledDeck.pop()]
 
 
         #playerHand = [['4', 'of', 'Club'], ['4', 'of', 'Spade']]
