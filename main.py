@@ -1,5 +1,9 @@
 import random
 
+def printFunc(cards):
+    for card in cards:
+        print(*card)
+
 pot = 100
 def createDeck():
     suits = ['Heart', 'Diamond', 'Spade', 'Club']
@@ -94,6 +98,8 @@ def never_bust_blackjack(playerHand, dealerHand, shuffledDeck):
             return 1
         
 def bs_blackjack(playerHand, dealerHand, shuffledDeck):
+    print(f"Player hand: {playerHand}")
+    print(f"Dealer card: {dealerHand[0]}")
     if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
         print("PUSH")
         return 0
@@ -105,13 +111,10 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck):
         return 1.5
     else:
         playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck)
-        print(playerHand, mult)
         if mult < 0:
             print("Player bust")
             return -1
-        print("ONE", len(shuffledDeck))
         dealerPlay(dealerHand, shuffledDeck)
-        print("TWO", len(shuffledDeck))
         print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
             print("Dealer bust")
@@ -337,16 +340,13 @@ def never_bust(playerHand, shuffledDeck):
     return playerHand
     
 def basic_strategy(playerHand, dealerHand, shuffledDeck):
-   
-    print(type(handValue(playerHand)))
+
     if dealerHand[0][0] in ['J', 'Q', 'K']:
         dealerCard = 10
     elif dealerHand[0][0] == 'A':
         dealerCard = 11
     else:
         dealerCard = int(dealerHand[0][0])
-    print(f"Player Hand: {playerHand}")
-    print(f"Dealer Card: {dealerCard}")
     hardHands = {
         21: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
         20: {2: "Stand", 3: "Stand", 4: "Stand", 5: "Stand", 6: "Stand", 7: "Stand", 8: "Stand", 9: "Stand", 10: "Stand", 11: "Stand"},
@@ -511,7 +511,6 @@ def handType(hand):
         else:
             total += int(hand[i][0])
     while ace > 0:
-        print(total, total+10)
         if total > 21:
             return "hard"
         else:
@@ -586,6 +585,7 @@ def basic_strategy_main():
     deck = shuffleDeck(createDeck())
     # results = []
     results = 0
+    wins = 0
     num = int(input("How many hands: "))
     for i in range(num):
         print(f"Hand number: {i}")
@@ -599,6 +599,8 @@ def basic_strategy_main():
             dealerHand.append(deck.pop())
         result = bs_blackjack(playerHand, dealerHand, deck)
         results += result
+        if result > 0:
+            wins += 1
         # if result > 1:
         #     results.append("D WIN")
         # elif result > 0:
@@ -610,6 +612,7 @@ def basic_strategy_main():
         # else:
         #     results.append("PUSH")
     print(results)
+    print(f"Win rate: {(wins/num)*100}%")
 
 choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
 if choice.lower() == "mimic":
@@ -620,5 +623,3 @@ elif choice.lower() == "basic":
     basic_strategy_main()
 elif choice.lower() == "normal":
     blackjack()
-
-
