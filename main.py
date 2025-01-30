@@ -1,4 +1,6 @@
 import random
+import matplotlib.pyplot as plt
+
 
 def printFunc(cards):
     for card in cards:
@@ -410,7 +412,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
         if handValue(playerHand) > 21:
             completed = True
             return playerHand, -1
-        if playerHand[0][0] == playerHand[1][0] and counter == 0:
+        if counter == 0 and playerHand[0][0] == playerHand[1][0]:
             print("PAIR")
             # playerHands = [0, 0]
             # for i in range(len(playerHand)):
@@ -533,6 +535,25 @@ def handType(hand):
 # elif choice.lower() == "normal":
 #     blackjack()
 
+def averageRows(rows):
+    averageR = 0 
+    avgRow = []
+    y = []
+    for j in range(len(rows[0])):
+        for i in range(len(rows)):
+            averageR += rows[i][j]  
+        averageR /= len(rows)
+        avgRow.append(averageR)
+        y.append(j)
+    plt.ylim(-2, 2)
+    plt.plot(y, avgRow, label = "Average Line")
+    plt.xlabel("Hand #")
+    plt.ylabel("Result")
+    plt.title("Average of 100 hands and 100 games")
+    plt.show()
+
+
+
 def main_mimic():
     deck = shuffleDeck(createDeck())
     results = []
@@ -582,37 +603,55 @@ def main_never_bust():
     print(results)
 
 def basic_strategy_main():
+    rows = []
     deck = shuffleDeck(createDeck())
     # results = []
     results = 0
     wins = 0
     num = int(input("How many hands: "))
-    for i in range(num):
-        print(f"Hand number: {i}")
-        if len(deck) < 10:
-            print("Reshuffling deck")
-            deck = shuffleDeck(createDeck())
-        playerHand = []
-        dealerHand = []
-        for j in range(2):
-            playerHand.append(deck.pop())
-            dealerHand.append(deck.pop())
-        result = bs_blackjack(playerHand, dealerHand, deck)
-        results += result
-        if result > 0:
-            wins += 1
-        # if result > 1:
-        #     results.append("D WIN")
-        # elif result > 0:
-        #     results.append("WIN")
-        # elif result < -1:
-        #     results.append("D LOSS")
-        # elif result < 0:
-        #     results.append("LOSS")
-        # else:
-        #     results.append("PUSH")
-    print(results)
+    for k in range(1000):
+        row = []
+        y = []
+        for i in range(num):
+            print(f"Hand number: {i}")
+            if len(deck) <= 12:
+                print("Reshuffling deck")
+                deck = shuffleDeck(createDeck())
+            playerHand = []
+            dealerHand = []
+            for j in range(2):
+                playerHand.append(deck.pop())
+                dealerHand.append(deck.pop())
+            print(f"CARDS LEFT: {len(deck)}")
+            result = bs_blackjack(playerHand, dealerHand, deck)
+            results += result
+            row.append(result)
+            if result > 0:
+                wins += 1
+            y.append(i)
+        print("Game DONE")
+        print(row)
+        rows.append(row)
+        # print(k, row)
+
+        plt.plot(y, row, label = f"Line {k}")
+            # if result > 1:
+            #     results.append("D WIN")
+            # elif result > 0:
+            #     results.append("WIN")
+            # elif result < -1:
+            #     results.append("D LOSS")
+            # elif result < 0:
+            #     results.append("LOSS")
+            # else:
+            #     results.append("PUSH")
+    # print(rows)
     print(f"Win rate: {(wins/num)*100}%")
+    plt.xlabel("Hand #")
+    plt.ylabel("Result")
+    plt.title("100 Games of 100 hands")
+    plt.show()
+    averageRows(rows)
 
 choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
 if choice.lower() == "mimic":
