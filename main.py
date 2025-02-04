@@ -649,7 +649,7 @@ def basic_strategy_main():
     print(f"Win rate: {(wins/num)*100}%")
     plt.xlabel("Hand #")
     plt.ylabel("Result")
-    plt.title("100 Games of 100 hands")
+    plt.title("1000 Games of 100 hands")
     plt.show()
     averageRows(rows)
 
