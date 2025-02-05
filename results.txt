@@ -1,0 +1,5 @@
+1000 Games of 100 Hands Results:
+
+Never Bust: 41.875% WR
+Mimic the Dealer: 41.159% WR
+Basic Strategy: 43.461% WR

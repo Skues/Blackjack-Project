@@ -555,51 +555,57 @@ def averageRows(rows):
 
 
 def main_mimic():
+    wins = 0
     deck = shuffleDeck(createDeck())
     results = []
     num = int(input("How many hands: "))
-
-    for i in range(num):
-        print(f"Hand number: {i}")
-        if len(deck) < 10:
-            print("Reshuffling deck")
-            deck = shuffleDeck(createDeck())
-        playerHand = []
-        dealerHand = []
-        for j in range(2):
-            playerHand.append(deck.pop())
-            dealerHand.append(deck.pop())
-        result = mimic_blackjack(playerHand, dealerHand, deck)
-        if result > 0:
-            results.append("WIN")
-        elif result < 0:
-            results.append("LOSS")
-        else:
-            results.append("PUSH")
+    for k in range(1000):
+        for i in range(num):
+            print(f"Hand number: {i}")
+            if len(deck) < 12:
+                print("Reshuffling deck")
+                deck = shuffleDeck(createDeck())
+            playerHand = []
+            dealerHand = []
+            for j in range(2):
+                playerHand.append(deck.pop())
+                dealerHand.append(deck.pop())
+            result = mimic_blackjack(playerHand, dealerHand, deck)
+            if result > 0:
+                wins += 1
+                results.append("WIN")
+            elif result < 0:
+                results.append("LOSS")
+            else:
+                results.append("PUSH")
+    print(f"Win rate: {(wins/(num*1000))*100}%")
     print(results)
 
 def main_never_bust():
+    wins = 0
     deck = shuffleDeck(createDeck())
     results = []
     num = int(input("How many hands: "))
-
-    for i in range(num):
-        print(f"Hand number: {i}")
-        if len(deck) < 10:
-            print("Reshuffling deck")
-            deck = shuffleDeck(createDeck())
-        playerHand = []
-        dealerHand = []
-        for j in range(2):
-            playerHand.append(deck.pop())
-            dealerHand.append(deck.pop())
-        result = never_bust_blackjack(playerHand, dealerHand, deck)
-        if result > 0:
-            results.append("WIN")
-        elif result < 0:
-            results.append("LOSS")
-        else:
-            results.append("PUSH")
+    for k in range(1000):
+        for i in range(num):
+            print(f"Hand number: {i}")
+            if len(deck) < 10:
+                print("Reshuffling deck")
+                deck = shuffleDeck(createDeck())
+            playerHand = []
+            dealerHand = []
+            for j in range(2):
+                playerHand.append(deck.pop())
+                dealerHand.append(deck.pop())
+            result = never_bust_blackjack(playerHand, dealerHand, deck)
+            if result > 0:
+                wins += 1
+                results.append("WIN")
+            elif result < 0:
+                results.append("LOSS")
+            else:
+                results.append("PUSH")
+    print(f"Win rate: {(wins/(num*1000))*100}%")
     print(results)
 
 def basic_strategy_main():
