@@ -545,11 +545,11 @@ def averageRows(rows):
         averageR /= len(rows)
         avgRow.append(averageR)
         y.append(j)
-    plt.ylim(-2, 2)
     plt.plot(y, avgRow, label = "Average Line")
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 100 games")
+    plt.axhline(y = 0.5, color = 'r', linestyle = '-') 
     plt.show()
 
 
@@ -610,14 +610,16 @@ def main_never_bust():
 
 def basic_strategy_main():
     rows = []
-    deck = shuffleDeck(createDeck())
     # results = []
     results = 0
     wins = 0
     num = int(input("How many hands: "))
     for k in range(1000):
+        pot = 0
         row = []
         y = []
+        deck = shuffleDeck(createDeck())
+
         for i in range(num):
             print(f"Hand number: {i}")
             if len(deck) <= 12:
@@ -630,8 +632,10 @@ def basic_strategy_main():
                 dealerHand.append(deck.pop())
             print(f"CARDS LEFT: {len(deck)}")
             result = bs_blackjack(playerHand, dealerHand, deck)
-            results += result
-            row.append(result)
+
+            pot += result
+            row.append(pot)
+
             if result > 0:
                 wins += 1
             y.append(i)
@@ -656,6 +660,7 @@ def basic_strategy_main():
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("1000 Games of 100 hands")
+    plt.axhline(y = 0.5, color = 'r', linestyle = '-') 
     plt.show()
     averageRows(rows)
 
