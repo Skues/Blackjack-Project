@@ -570,6 +570,7 @@ def averageRows(rows):
         avgRow.append(averageR)
         y.append(j)
     plt.plot(y, avgRow, label = "Average Line")
+    plt.ylim(-5, 5)
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 100 games")
@@ -583,7 +584,10 @@ def main_mimic():
     deck = shuffleDeck(createDeck())
     results = []
     num = int(input("How many hands: "))
+    rows = []
     for k in range(1000):
+        pot = 0
+        row = []
         for i in range(num):
             print(f"Hand number: {i}")
             if len(deck) < 12:
@@ -602,15 +606,22 @@ def main_mimic():
                 results.append("LOSS")
             else:
                 results.append("PUSH")
+            pot += result
+            row.append(pot)
+        rows.append(row)
+    averageRows(rows)
     print(f"Win rate: {(wins/(num*1000))*100}%")
     print(results)
 
 def main_never_bust():
     wins = 0
+    rows =[]
     deck = shuffleDeck(createDeck())
     results = []
     num = int(input("How many hands: "))
     for k in range(1000):
+        pot = 0
+        row = []
         for i in range(num):
             print(f"Hand number: {i}")
             if len(deck) < 10:
@@ -629,6 +640,12 @@ def main_never_bust():
                 results.append("LOSS")
             else:
                 results.append("PUSH")
+            pot += result
+            row.append(pot)
+        rows.append(row)
+    averageRows(rows)
+
+
     print(f"Win rate: {(wins/(num*1000))*100}%")
     print(results)
 
