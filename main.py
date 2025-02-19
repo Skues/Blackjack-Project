@@ -1,6 +1,6 @@
 import random
 import matplotlib.pyplot as plt
-
+hasSplit = False
 
 def printFunc(cards):
     for card in cards:
@@ -448,19 +448,19 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
         if handValue(playerHand) > 21:
             completed = True
             return playerHand, -1
-        if counter == 0 and playerHand[0][0] == playerHand[1][0]:
-            print("PAIR")
-            print(playerHand)
-            action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
-            print(action)
-            if action == "dk":
-                print(f"DK ERROR: {playerHand} and {dealerCard}")
-                break
-            if action == "Yes":
-                print("SPLITTT")
-                counter += 1
-                return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
-            counter += 1
+        # if hasSplit != True and playerHand[0][0] == playerHand[1][0]:
+        #     print("PAIR")
+        #     print(playerHand)
+        #     action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
+        #     print(action)
+        #     if action == "dk":
+        #         print(f"DK ERROR: {playerHand} and {dealerCard}")
+        #         break
+        #     if action == "Yes":
+        #         print("SPLITTT")
+        #         counter += 1
+        #         return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
+        #     counter += 1
         if handType(playerHand) == "soft" and playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
             print("SOFT")
             print(handType(playerHand))
@@ -474,7 +474,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
                     break
             playerHand.insert(0, temp)
             action = softHands.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
-            # action = softHands2.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
+            #action = softHands2.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
             # action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
             if action == "dk":
                 print(f"DK ERROR: {playerHand} and {dealerCard}")
@@ -514,6 +514,8 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
                 return playerHand, 1
 
 def bs_split(playerHand, dealerHand, shuffledDeck):
+    global hasSplit 
+    hasSplit = True
     playerHand2 = [playerHand.pop()]
     playerHand.append(shuffledDeck.pop())
     playerHand2.append(shuffledDeck.pop())
@@ -573,7 +575,7 @@ def averageRows(rows):
     plt.ylim(-5, 5)
     plt.xlabel("Hand #")
     plt.ylabel("Result")
-    plt.title("Average of 100 hands and 100 games")
+    plt.title("Average of 100 hands and 10000 games")
     plt.axhline(y = 0, color = 'r', linestyle = '-') 
     plt.show()
 
@@ -585,7 +587,7 @@ def main_mimic():
     results = []
     num = int(input("How many hands: "))
     rows = []
-    for k in range(1000):
+    for k in range(10000):
         pot = 0
         row = []
         for i in range(num):
@@ -619,7 +621,7 @@ def main_never_bust():
     deck = shuffleDeck(createDeck())
     results = []
     num = int(input("How many hands: "))
-    for k in range(1000):
+    for k in range(10000):
         pot = 0
         row = []
         for i in range(num):
@@ -655,7 +657,7 @@ def basic_strategy_main():
     results = 0
     wins = 0
     num = int(input("How many hands: "))
-    for k in range(1000):
+    for k in range(5000):
         pot = 0
         row = []
         y = []
