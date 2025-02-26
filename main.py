@@ -101,35 +101,35 @@ def never_bust_blackjack(playerHand, dealerHand, shuffledDeck):
         
 def bs_blackjack(playerHand, dealerHand, shuffledDeck):
     hasSplit = False
-    print(f"Player hand: {playerHand}")
-    print(f"Dealer card: {dealerHand[0]}")
+    #print(f"Player hand: {playerHand}")
+    #print(f"Dealer card: {dealerHand[0]}")
     if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
-        print("PUSH")
+        #print("PUSH")
         return 0
     elif blackjackCheck(dealerHand):
-        print("Dealer wins, Blackjack")
+        #print("Dealer wins, Blackjack")
         return -1
     elif blackjackCheck(playerHand):
-        print("Player wins 3/2 payout")
+        #print("Player wins 3/2 payout")
         return 1.5
     else:
         playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit)
         if mult < 0:
-            print("Player bust")
+            #print("Player bust")
             return -1
         dealerPlay(dealerHand, shuffledDeck)
-        print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
+        #print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
-            print("Dealer bust")
+            #print("Dealer bust")
             return 1*mult
         elif handValue(dealerHand) == handValue(playerHand):
-            print("PUSH")
+            #print("PUSH")
             return 0
         elif handValue(dealerHand) > handValue(playerHand):
-            print("DEALER WIN")
+            #print("DEALER WIN")
             return -1*mult
         else:
-            print("PLAYER WIN")
+            #print("PLAYER WIN")
             return 1*mult
 
 def blackjack():
@@ -252,19 +252,19 @@ def playHand(playerHand, shuffledDeck):
             if action.lower() == "hit":
                 counter += 1
                 playerHand.append(shuffledDeck.pop())
-                print(f"Player Hand: {playerHand}")
-                print(f"Player hand value: {handValue(playerHand)}")
+                #print(f"Player Hand: {playerHand}")
+                #print(f"Player hand value: {handValue(playerHand)}")
                 if handValue(playerHand) > 21:
-                    print("Bust!")
+                    #print("Bust!")
                     return 1
             elif action.lower() == "stand":
                 return 1
             elif action.lower() == "double":
                 counter += 1
                 playerHand.append(shuffledDeck.pop())
-                print(f"Player Hand: {playerHand}")
+                #print(f"Player Hand: {playerHand}")
                 if handValue(playerHand) > 21:
-                    print("Bust!")
+                    #print("Bust!")
                     return -2
                 else:
                     return 2
@@ -272,19 +272,19 @@ def playHand(playerHand, shuffledDeck):
             action = input("Hit or Stand? ")
             if action.lower() == "hit":
                 playerHand.append(shuffledDeck.pop())
-                print(f"Player Hand: {playerHand}")
-                print(f"Player hand value: {handValue(playerHand)}")
+                #print(f"Player Hand: {playerHand}")
+                #print(f"Player hand value: {handValue(playerHand)}")
                 if handValue(playerHand) > 21:
-                    print("Bust!")
+                    #print("Bust!")
                     return -1
             elif action.lower() == "stand":
                 return 1
             
 def dealerPlay(dealerHand, shuffledDeck):
-    print(f"Dealers hand: {dealerHand}")
+    #print(f"Dealers hand: {dealerHand}")
     while handValue(dealerHand) < 17:
         dealerHand.append(shuffledDeck.pop())
-        print(f"Dealers hand: {dealerHand}")
+        #print(f"Dealers hand: {dealerHand}")
 
 
 def splitFunction(playerHand, shuffledDeck, dealerHand):
@@ -450,78 +450,77 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
             completed = True
             return playerHand, -1
         if hasSplit != True and playerHand[0][0] == playerHand[1][0]:
-            print("PAIR")
-            print(playerHand)
+            #print("PAIR")
+            #print(playerHand)
             action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
-            print(action)
+            #print(action)
             if action == "dk":
-                print(f"DK ERROR: {playerHand} and {dealerCard}")
+                #print(f"DK ERROR: {playerHand} and {dealerCard}")
                 break
             if action == "Yes":
-                print("SPLITTT")
+                #print("SPLITTT")
                 counter += 1
                 return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
             counter += 1
         if handType(playerHand) == "soft" and playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
-            print("SOFT")
-            print(handType(playerHand))
+            #print("SOFT")
+            #print(handType(playerHand))
             temp = ""
             for i in range(len(playerHand)):
-                print(len(playerHand))
+                #print(len(playerHand))
                 if playerHand[i][0] == 'A':
-                    print("YEP")
+                    #print("YEP")
                     temp = playerHand.pop(i)
-                    print(temp, playerHand)
+                    #print(temp, playerHand)
                     break
             playerHand.insert(0, temp)
             action = softHands.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
-            #action = softHands2.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
+            # action = softHands2.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
             # action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
             if action == "dk":
-                print(f"DK ERROR: {playerHand} and {dealerCard}")
+                #print(f"DK ERROR: {playerHand} and {dealerCard}")
                 break
-            print(action)
+            #print(action)
             if action == "Hit":
                 playerHand.append(shuffledDeck.pop())
-                print(f"AFTER HIT: {playerHand}")
+                #print(f"AFTER HIT: {playerHand}")
             elif action == "Double":
                 playerHand.append(shuffledDeck.pop())
                 completed = True
                 return playerHand, 2
             elif action == "Stand":
                 completed = True
-                print("STAND")
-                print(playerHand, "STANDING")
+                #print("STAND")
+                #print(playerHand, "STANDING")
                 return playerHand, 1
         else:
-            print("HARD")
+            #print("HARD")
             action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
             if action == "dk":
-                print(f"DK ERROR: {playerHand} and {dealerCard}")
+                #print(f"DK ERROR: {playerHand} and {dealerCard}")
                 break
-            print(action)
+            #print(action)
             if action == "Hit":
                 playerHand.append(shuffledDeck.pop())
-                print(f"AFTER HIT: {playerHand}")
+                #print(f"AFTER HIT: {playerHand}")
             elif action == "Double":
                 playerHand.append(shuffledDeck.pop())
-                print(f"AFTER DOUBLE: {playerHand}")
+                #print(f"AFTER DOUBLE: {playerHand}")
                 completed = True
                 return playerHand, 2
             elif action == "Stand":
-                print(f"AFTER STAND: {playerHand}")
+                #print(f"AFTER STAND: {playerHand}")
 
                 completed = True
                 return playerHand, 1
 
 def bs_split(playerHand, dealerHand, shuffledDeck):
-    global hasSplit 
     hasSplit = True
     playerHand2 = [playerHand.pop()]
     playerHand.append(shuffledDeck.pop())
     playerHand2.append(shuffledDeck.pop())
-    hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit=True)
-    hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck, hasSplit=True)
+    hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit)
+    hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck, hasSplit)
 
     total = result1 + result2
 
@@ -658,7 +657,8 @@ def basic_strategy_main():
     results = 0
     wins = 0
     num = int(input("How many hands: "))
-    for k in range(5000):
+    for k in range(10000):
+        print(k)
         hasSplit = False
         pot = 0
         row = []
@@ -666,16 +666,16 @@ def basic_strategy_main():
         deck = shuffleDeck(createDeck())
 
         for i in range(num):
-            print(f"Hand number: {i}")
+            #print(f"Hand number: {i}")
             if len(deck) <= 12:
-                print("Reshuffling deck")
+                #print("Reshuffling deck")
                 deck = shuffleDeck(createDeck())
             playerHand = []
             dealerHand = []
             for j in range(2):
                 playerHand.append(deck.pop())
                 dealerHand.append(deck.pop())
-            print(f"CARDS LEFT: {len(deck)}")
+            #print(f"CARDS LEFT: {len(deck)}")
             result = bs_blackjack(playerHand, dealerHand, deck)
 
             pot += result
@@ -684,8 +684,8 @@ def basic_strategy_main():
             if result > 0:
                 wins += 1
             y.append(i)
-        print("Game DONE")
-        print(row)
+        #print("Game DONE")
+        #print(row)
         rows.append(row)
         # print(k, row)
 
@@ -701,7 +701,7 @@ def basic_strategy_main():
             # else:
             #     results.append("PUSH")
     # print(rows)
-    print(f"Win rate: {(wins/num)*100}%")
+    #print(f"Win rate: {(wins/num)*100}%")
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("1000 Games of 100 hands")
