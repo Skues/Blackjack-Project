@@ -100,6 +100,7 @@ def never_bust_blackjack(playerHand, dealerHand, shuffledDeck):
             return 1
         
 def bs_blackjack(playerHand, dealerHand, shuffledDeck):
+    hasSplit = False
     print(f"Player hand: {playerHand}")
     print(f"Dealer card: {dealerHand[0]}")
     if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
@@ -112,7 +113,7 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck):
         print("Player wins 3/2 payout")
         return 1.5
     else:
-        playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck)
+        playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit)
         if mult < 0:
             print("Player bust")
             return -1
@@ -341,7 +342,7 @@ def never_bust(playerHand, shuffledDeck):
         print(playerHand)
     return playerHand
     
-def basic_strategy(playerHand, dealerHand, shuffledDeck):
+def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
 
     if dealerHand[0][0] in ['J', 'Q', 'K']:
         dealerCard = 10
@@ -448,19 +449,19 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck):
         if handValue(playerHand) > 21:
             completed = True
             return playerHand, -1
-        # if hasSplit != True and playerHand[0][0] == playerHand[1][0]:
-        #     print("PAIR")
-        #     print(playerHand)
-        #     action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
-        #     print(action)
-        #     if action == "dk":
-        #         print(f"DK ERROR: {playerHand} and {dealerCard}")
-        #         break
-        #     if action == "Yes":
-        #         print("SPLITTT")
-        #         counter += 1
-        #         return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
-        #     counter += 1
+        if hasSplit != True and playerHand[0][0] == playerHand[1][0]:
+            print("PAIR")
+            print(playerHand)
+            action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
+            print(action)
+            if action == "dk":
+                print(f"DK ERROR: {playerHand} and {dealerCard}")
+                break
+            if action == "Yes":
+                print("SPLITTT")
+                counter += 1
+                return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
+            counter += 1
         if handType(playerHand) == "soft" and playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
             print("SOFT")
             print(handType(playerHand))
@@ -519,8 +520,8 @@ def bs_split(playerHand, dealerHand, shuffledDeck):
     playerHand2 = [playerHand.pop()]
     playerHand.append(shuffledDeck.pop())
     playerHand2.append(shuffledDeck.pop())
-    hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck)
-    hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck)
+    hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit=True)
+    hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck, hasSplit=True)
 
     total = result1 + result2
 
@@ -658,6 +659,7 @@ def basic_strategy_main():
     wins = 0
     num = int(input("How many hands: "))
     for k in range(5000):
+        hasSplit = False
         pot = 0
         row = []
         y = []
