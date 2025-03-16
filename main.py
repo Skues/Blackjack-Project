@@ -516,6 +516,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
 
 def bs_split(playerHand, dealerHand, shuffledDeck):
     hasSplit = True
+    print("SPLIT AND CALLING FUNCTIONS")
     playerHand2 = [playerHand.pop()]
     playerHand.append(shuffledDeck.pop())
     playerHand2.append(shuffledDeck.pop())
