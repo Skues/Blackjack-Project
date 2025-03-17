@@ -1,10 +1,11 @@
 import random
 import matplotlib.pyplot as plt
+import pandas as pd
 hasSplit = False
 
-def printFunc(cards):
-    for card in cards:
-        print(*card)
+# def printFunc(cards):
+#     for card in cards:
+#         print(*card)
 
 pot = 100
 def createDeck():
@@ -37,66 +38,66 @@ def initialise_blackjack():
 
 def mimic_blackjack(playerHand, dealerHand, shuffledDeck):
     if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
-        print("PUSH")
+        #print("PUSH")
         return 0
     elif blackjackCheck(dealerHand):
-        print("Dealer wins, Blackjack")
+        #print("Dealer wins, Blackjack")
         return -1
     elif blackjackCheck(playerHand):
-        print("Player wins 3/2 payout")
+        #print("Player wins 3/2 payout")
         return 1.5
     else:
         playerHand = mimic_the_dealer(playerHand, shuffledDeck)
         if handValue(playerHand) > 21:
-            print("Player bust")
+            #print("Player bust")
             return -1
-        print("ONE", len(shuffledDeck))
+        #print("ONE", len(shuffledDeck))
         dealerPlay(dealerHand, shuffledDeck)
-        print("TWO", len(shuffledDeck))
-        print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
+        #print("TWO", len(shuffledDeck))
+        #print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
-            print("Dealer bust")
+            #print("Dealer bust")
             return 1
         elif handValue(dealerHand) == handValue(playerHand):
-            print("PUSH")
+            #print("PUSH")
             return 0
         elif handValue(dealerHand) > handValue(playerHand):
-            print("DEALER WIN")
+            #print("DEALER WIN")
             return -1
         else:
-            print("PLAYER WIN")
+            #print("PLAYER WIN")
             return 1
 
 def never_bust_blackjack(playerHand, dealerHand, shuffledDeck):
     if blackjackCheck(dealerHand) == True and blackjackCheck(playerHand) == True:
-        print("PUSH")
+        #print("PUSH")
         return 0
     elif blackjackCheck(dealerHand):
-        print("Dealer wins, Blackjack")
+        #print("Dealer wins, Blackjack")
         return -1
     elif blackjackCheck(playerHand):
-        print("Player wins 3/2 payout")
+        #print("Player wins 3/2 payout")
         return 1.5
     else:
         playerHand = never_bust(playerHand, shuffledDeck)
         if handValue(playerHand) > 21:
-            print("Player bust")
+            #print("Player bust")
             return -1
-        print("ONE", len(shuffledDeck))
+        #print("ONE", len(shuffledDeck))
         dealerPlay(dealerHand, shuffledDeck)
-        print("TWO", len(shuffledDeck))
-        print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
+        #print("TWO", len(shuffledDeck))
+        #print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
-            print("Dealer bust")
+            #print("Dealer bust")
             return 1
         elif handValue(dealerHand) == handValue(playerHand):
-            print("PUSH")
+            #print("PUSH")
             return 0
         elif handValue(dealerHand) > handValue(playerHand):
-            print("DEALER WIN")
+            #print("DEALER WIN")
             return -1
         else:
-            print("PLAYER WIN")
+            #print("PLAYER WIN")
             return 1
         
 def bs_blackjack(playerHand, dealerHand, shuffledDeck):
@@ -327,19 +328,19 @@ def splitFunction(playerHand, shuffledDeck, dealerHand):
     return total
 
 def mimic_the_dealer(playerHand, shuffledDeck):
-    print("FIRST", playerHand)
+    #print("FIRST", playerHand)
     while handValue(playerHand) < 17:
-        print("MIMIC VALUE:", handValue(playerHand))
+        #print("MIMIC VALUE:", handValue(playerHand))
         playerHand.append(shuffledDeck.pop())
-        print(playerHand)
+        #print(playerHand)
     return playerHand
 
 def never_bust(playerHand, shuffledDeck):
     while handValue(playerHand) < 12:
         # hit on 11 and below
-        print(f"Never bust value: {handValue(playerHand)}")
+        #print(f"Never bust value: {handValue(playerHand)}")
         playerHand.append(shuffledDeck.pop())
-        print(playerHand)
+        #print(playerHand)
     return playerHand
     
 def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
@@ -516,7 +517,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
 
 def bs_split(playerHand, dealerHand, shuffledDeck):
     hasSplit = True
-    print("SPLIT AND CALLING FUNCTIONS")
+    # print("SPLIT AND CALLING FUNCTIONS")
     playerHand2 = [playerHand.pop()]
     playerHand.append(shuffledDeck.pop())
     playerHand2.append(shuffledDeck.pop())
@@ -545,22 +546,7 @@ def handType(hand):
         else:
             return "soft"
 
-# ph, dh, d = initialise_blackjack()
-# results = []
-#
-# num = int(input("How many hands: "))
-#
-#     for i in range(num):
-#         result = mimic_blackjack(ph, dh, d)
-#         if result > 0:
-#             results.append("WIN")
-#         elif result < 0:
-#             results.append("LOSS")
-#         else:
-#             results.append("PUSH")
-#     print(results)
-# elif choice.lower() == "normal":
-#     blackjack()
+
 
 def averageRows(rows):
     averageR = 0 
@@ -583,18 +569,21 @@ def averageRows(rows):
 
 
 def main_mimic():
-    wins = 0
+    winnings = 0
+    win = 0
+    push = 0
+    loss = 0 
     deck = shuffleDeck(createDeck())
     results = []
-    num = int(input("How many hands: "))
+    num = 100#int(input("How many hands: "))
     rows = []
     for k in range(10000):
         pot = 0
         row = []
         for i in range(num):
-            print(f"Hand number: {i}")
+            #print(f"Hand number: {i}")
             if len(deck) < 12:
-                print("Reshuffling deck")
+                
                 deck = shuffleDeck(createDeck())
             playerHand = []
             dealerHand = []
@@ -602,33 +591,39 @@ def main_mimic():
                 playerHand.append(deck.pop())
                 dealerHand.append(deck.pop())
             result = mimic_blackjack(playerHand, dealerHand, deck)
-            if result > 0:
-                wins += 1
-                results.append("WIN")
-            elif result < 0:
-                results.append("LOSS")
-            else:
-                results.append("PUSH")
             pot += result
             row.append(pot)
+            if result == 0:
+                push += 1
+            elif result > 0:
+                winnings += result
+                win += 1
+            elif result < 0:
+                loss += 1
         rows.append(row)
     averageRows(rows)
-    print(f"Win rate: {(wins/(num*1000))*100}%")
-    print(results)
+    # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
+    # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
+
+    return win/10000, push/10000, loss/10000, (winnings-1000000)/1000000
+
 
 def main_never_bust():
-    wins = 0
+    winnings = 0
+    win = 0
+    push = 0
+    loss = 0 
     rows =[]
     deck = shuffleDeck(createDeck())
     results = []
-    num = int(input("How many hands: "))
+    num = 100#int(input("How many hands: "))
     for k in range(10000):
         pot = 0
         row = []
         for i in range(num):
-            print(f"Hand number: {i}")
-            if len(deck) < 10:
-                print("Reshuffling deck")
+            #print(f"Hand number: {i}")
+            if len(deck) < 12:
+                #print("Reshuffling deck")
                 deck = shuffleDeck(createDeck())
             playerHand = []
             dealerHand = []
@@ -636,30 +631,37 @@ def main_never_bust():
                 playerHand.append(deck.pop())
                 dealerHand.append(deck.pop())
             result = never_bust_blackjack(playerHand, dealerHand, deck)
-            if result > 0:
-                wins += 1
-                results.append("WIN")
-            elif result < 0:
-                results.append("LOSS")
-            else:
-                results.append("PUSH")
+            
             pot += result
+            if result == 0:
+                push += 1
+            elif result > 0:
+                winnings += result
+                win += 1
+            elif result < 0:
+                loss += 1
             row.append(pot)
         rows.append(row)
     averageRows(rows)
 
 
-    print(f"Win rate: {(wins/(num*1000))*100}%")
-    print(results)
+    # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
+    # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
+
+    #print(results)
+    return win/10000, push/10000, loss/10000, (winnings-1000000)/1000000
 
 def basic_strategy_main():
     rows = []
     # results = []
-    results = 0
-    wins = 0
-    num = int(input("How many hands: "))
+    winnings = 0
+    win = 0
+    push = 0
+    loss = 0 
+    
+    num = 100#int(input("How many hands: "))
     for k in range(10000):
-        print(k)
+        #print(k)
         hasSplit = False
         pot = 0
         row = []
@@ -682,8 +684,13 @@ def basic_strategy_main():
             pot += result
             row.append(pot)
 
-            if result > 0:
-                wins += 1
+            if result == 0:
+                push += 1
+            elif result > 0:
+                winnings += result
+                win += 1
+            elif result < 0:
+                loss += 1
             y.append(i)
         #print("Game DONE")
         #print(row)
@@ -709,6 +716,24 @@ def basic_strategy_main():
     plt.axhline(y = 0, color = 'r', linestyle = '-') 
     plt.show()
     averageRows(rows)
+    # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
+    # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
+    return win/10000, push/10000, loss/10000, (winnings-1000000)/1000000
+
+def loop_strategy():
+    mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic()
+    neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust()
+    basic_wr, basic_pr, basic_lr, basic_avgprofit = basic_strategy_main()
+
+    data = {
+        "Strategy": ["Mimic the Dealer", "Never Bust", "Basic Strategy"],
+        "Win rate": [mimic_wr, neverb_wr, basic_wr],
+        "Push rate": [mimic_pr, neverb_pr, basic_pr],
+        "Loss rate": [mimic_lr, neverb_lr, basic_lr],
+        "Avg Profit per Hand": [mimic_avgprofit, neverb_avgprofit, basic_avgprofit]
+    }
+    df = pd.DataFrame(data)
+    print(df)
 
 choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
 if choice.lower() == "mimic":
@@ -719,3 +744,5 @@ elif choice.lower() == "basic":
     basic_strategy_main()
 elif choice.lower() == "normal":
     blackjack()
+elif choice.lower() == "loop":
+    loop_strategy()
