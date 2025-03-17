@@ -119,6 +119,7 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck):
             #print("Player bust")
             return -1
         dealerPlay(dealerHand, shuffledDeck)
+        print(calculateCount(playerHand, dealerHand))
         #print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
             #print("Dealer bust")
@@ -344,7 +345,7 @@ def never_bust(playerHand, shuffledDeck):
     return playerHand
     
 def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
-
+    count = 0
     if dealerHand[0][0] in ['J', 'Q', 'K']:
         dealerCard = 10
     elif dealerHand[0][0] == 'A':
@@ -546,7 +547,17 @@ def handType(hand):
         else:
             return "soft"
 
-
+def calculateCount(playerHand, dealerHand):
+    count = 0
+    for hands in [playerHand, dealerHand]:
+        for card in hands:
+            if card[0] in (2, 3, 4, 5, 6):
+                count += 1
+            elif card[0] in (7, 8, 9):
+                count += 0
+            else: 
+                count -= 1
+    return count
 
 def averageRows(rows):
     averageR = 0 
