@@ -35,3 +35,6 @@ Basic Strategy: 43.461% WR, 43.268% WR
 0  Mimic the Dealer      41.20636    9.58815   49.20549          0.3296822
 1        Never Bust      41.94394    6.16612   51.88994          0.3370604
 2    Basic Strategy      43.52964    8.66586   47.80450          0.4274539
+
+ Win rate  Push rate  Loss rate  Profit p hand
+0   43.5457    8.66611   47.78819      -0.472269

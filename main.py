@@ -733,22 +733,27 @@ def basic_strategy_main():
     averageRows(rows)
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
     # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
-    return win/10000, push/10000, loss/10000, (winnings-1000000)/1000000
+    return win/100000, push/100000, loss/100000, (winnings-10000000)/10000000
 
 def loop_strategy():
-    mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic()
-    neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust()
+    # mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic()
+    # neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust()
     basic_wr, basic_pr, basic_lr, basic_avgprofit = basic_strategy_main()
 
-    data = {
-        "Strategy": ["Mimic the Dealer", "Never Bust", "Basic Strategy"],
-        "Win rate": [mimic_wr, neverb_wr, basic_wr],
-        "Push rate": [mimic_pr, neverb_pr, basic_pr],
-        "Loss rate": [mimic_lr, neverb_lr, basic_lr],
-        "Avg Profit per Hand": [mimic_avgprofit, neverb_avgprofit, basic_avgprofit]
-    }
-    df = pd.DataFrame(data)
-    print(df)
+    basic_data = {"Win rate": [basic_wr],
+                  "Push rate": [basic_pr],
+                  "Loss rate": [basic_lr],
+                  "Profit p hand": [basic_avgprofit]}
+    # data = {
+    #     "Strategy": ["Mimic the Dealer", "Never Bust", "Basic Strategy"],
+    #     "Win rate": [mimic_wr, neverb_wr, basic_wr],
+    #     "Push rate": [mimic_pr, neverb_pr, basic_pr],
+    #     "Loss rate": [mimic_lr, neverb_lr, basic_lr],
+    #     "Avg Profit per Hand": [mimic_avgprofit, neverb_avgprofit, basic_avgprofit]
+    # }
+    # df = pd.DataFrame(data)
+    BSdf = pd.DataFrame(basic_data)
+    print(BSdf)
 
 choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
 if choice.lower() == "mimic":
