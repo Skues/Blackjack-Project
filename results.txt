@@ -10,3 +10,28 @@ Basic Strategy: 43.461% WR, 43.268% WR
 0  Mimic the Dealer   41.2398     9.5983    49.1619            -0.570098
 1        Never Bust   41.8373     6.1517    52.0110            -0.564203
 2    Basic Strategy   43.4568     8.6706    47.8726            -0.472938
+
+           Strategy  Win rate  Push rate  Loss rate  Avg Profit per Hand
+0  Mimic the Dealer   41.2139     9.6036    49.1825            -0.570227
+1        Never Bust   41.8304     6.1370    52.0326            -0.564267
+2    BS No Split      43.3602     8.3687    48.2711            -0.485245
+
+           Strategy  Win rate  Push rate  Loss rate  Avg Profit per Hand
+0  Mimic the Dealer   41.2526     9.5246    49.2228            -0.569986
+1        Never Bust   41.7815     6.1247    52.0938            -0.564728
+ BS No Split/Double   43.3737     8.6240    48.0023            -0.548880
+
+           Strategy  Win rate  Push rate  Loss rate  Avg Profit per Hand
+0  Mimic the Dealer   41.1596     9.6217    49.2187            -0.571065
+1        Never Bust   41.8045     6.1599    52.0356            -0.564480
+2  BS No Double       43.5934     8.8200    47.5866            -0.538527
+
+           Strategy  Win rate  Push rate  Loss rate  Avg Profit per Hand
+
+    Basic Strategy   43.5863     8.6539    47.7598            -0.471677
+
+
+               Strategy  Win rate  Push rate  Loss rate  Avg Profit per Hand
+0  Mimic the Dealer      41.20636    9.58815   49.20549          0.3296822
+1        Never Bust      41.94394    6.16612   51.88994          0.3370604
+2    Basic Strategy      43.52964    8.66586   47.80450          0.4274539

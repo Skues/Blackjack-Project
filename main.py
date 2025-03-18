@@ -119,7 +119,7 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck):
             #print("Player bust")
             return -1
         dealerPlay(dealerHand, shuffledDeck)
-        print(calculateCount(playerHand, dealerHand))
+        #print(calculateCount(playerHand, dealerHand))
         #print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
             #print("Dealer bust")
@@ -477,7 +477,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
                     break
             playerHand.insert(0, temp)
             action = softHands.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
-            # action = softHands2.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
+            #action = softHands2.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
             # action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
             if action == "dk":
                 #print(f"DK ERROR: {playerHand} and {dealerCard}")
@@ -584,14 +584,15 @@ def main_mimic():
     win = 0
     push = 0
     loss = 0 
-    deck = shuffleDeck(createDeck())
+    
     results = []
-    num = 100#int(input("How many hands: "))
+    num = 10000#int(input("How many hands: "))
     rows = []
-    for k in range(10000):
+    for k in range(1000):
         pot = 0
         row = []
         for i in range(num):
+            deck = shuffleDeck(createDeck())
             #print(f"Hand number: {i}")
             if len(deck) < 12:
                 
@@ -612,7 +613,7 @@ def main_mimic():
             elif result < 0:
                 loss += 1
         rows.append(row)
-    averageRows(rows)
+    #averageRows(rows)
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
     # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
 
@@ -627,11 +628,13 @@ def main_never_bust():
     rows =[]
     deck = shuffleDeck(createDeck())
     results = []
-    num = 100#int(input("How many hands: "))
-    for k in range(10000):
+    num = 10000#int(input("How many hands: "))
+    for k in range(1000):
         pot = 0
         row = []
         for i in range(num):
+            deck = shuffleDeck(createDeck())
+
             #print(f"Hand number: {i}")
             if len(deck) < 12:
                 #print("Reshuffling deck")
@@ -653,7 +656,7 @@ def main_never_bust():
                 loss += 1
             row.append(pot)
         rows.append(row)
-    averageRows(rows)
+    #averageRows(rows)
 
 
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
@@ -670,16 +673,17 @@ def basic_strategy_main():
     push = 0
     loss = 0 
     
-    num = 100#int(input("How many hands: "))
-    for k in range(10000):
+    num = 10000#int(input("How many hands: "))
+    for k in range(1000):
         #print(k)
         hasSplit = False
         pot = 0
         row = []
         y = []
-        deck = shuffleDeck(createDeck())
+        
 
         for i in range(num):
+            deck = shuffleDeck(createDeck())
             #print(f"Hand number: {i}")
             if len(deck) <= 12:
                 #print("Reshuffling deck")
