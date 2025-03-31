@@ -464,7 +464,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
         if handValue(playerHand) > 21:
             completed = True
             return playerHand, -1
-        if hasSplit != True and playerHand[0][0] == playerHand[1][0]:
+        if hasSplit != True and playerHand[0][0] == playerHand[1][0]:   
             #print("PAIR")
             #print(playerHand)
             action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
@@ -561,7 +561,7 @@ def bs_split(playerHand, dealerHand, shuffledDeck):
 def handType(hand):
     total = 0
     ace = 0
-    for i in range (len(hand)):
+    for i in range(len(hand)):
         if hand[i][0] == "J" or hand[i][0] == "Q" or hand[i][0] == "K":
             total += 10
         elif hand[i][0] == "A":
@@ -569,11 +569,13 @@ def handType(hand):
             ace += 1
         else:
             total += int(hand[i][0])
-    while ace > 0:
-        if total > 21:
-            return "hard"
-        else:
-            return "soft"
+    
+    if total > 21 and ace > 0:
+        return "hard"
+    elif ace > 0:
+        return "soft"
+    else:
+        return "hard"
 
 def calculateCount(playerHand, dealerHand):
     count = 0
