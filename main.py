@@ -696,20 +696,34 @@ def main_never_bust():
     return win/10000, push/10000, loss/10000, (winnings-1000000)/1000000
 
 
-def get_bet(true_count):
-    if true_count <= 0:
-        return 3
-    elif true_count == 1:
-        return 6
-    elif true_count ==2:
-        return 9
-    elif true_count == 3:
-        return 12
-    else:
-        return 15
+def get_bet(true_count, bet_type):
+    if bet_type == 1:
+        if true_count <= 0:
+            return 1
+        elif true_count == 1:
+            return 2
+        elif true_count ==2:
+            return 4
+        elif true_count == 3:
+            return 6
+        else:
+            return 8
+    elif bet_type == 2:
+        if true_count <= 0:
+            return 1
+        elif true_count == 1:
+            return 3
+        elif true_count ==2:
+            return 6
+        elif true_count == 3:
+            return 9
+        else:
+            return 12
     
-def basic_strategy_main():
+def basic_strategy_main(bet_type):
     global running_count
+    results = []
+    bankrolls = []
     hand_results = []
     rows = []
     # results = []
@@ -720,6 +734,8 @@ def basic_strategy_main():
     
     num = 100#int(input("How many hands: "))
     for k in range(10000):
+        bankroll = 100
+
         #print(k)
         hasSplit = False
         pot = 0
@@ -735,7 +751,7 @@ def basic_strategy_main():
                 #print("Reshuffling deck")
                 deck = shuffleDeck(createDeck())
                 running_count = 0
-            bet = get_bet(running_count)
+            bet = get_bet(running_count, bet_type)
             playerHand = []
             dealerHand = []
             for j in range(2):
@@ -749,10 +765,9 @@ def basic_strategy_main():
 
             #print(f"CARDS LEFT: {len(deck)}")
             result = bs_blackjack(playerHand, dealerHand, deck) * bet
-
+            bankroll += result
             pot += result
             row.append(pot)
-
             if result == 0:
                 push += 1
             elif result > 0:
@@ -761,44 +776,66 @@ def basic_strategy_main():
             elif result < 0:
                 loss += 1
             y.append(i)
+        results.append(pot)
+        
+        
 
-            hand_results.append({
-                'hand': i + (k * num),
-                'running_count': running_count,
-                'bet': bet,
-                'result': result,
-                'cumulative_winnings': pot
-            })
+
+        bankrolls.append(bankroll)
+
         #print("Game DONE")
         #print(row)
         rows.append(row)
         # print(k, row)
+    mean = sum(results)/10000
+    print(mean)
+    print(min(results))
+    print(max(results))
+    squared_difference = []
+    for i in results:
+        squared_difference.append((i-mean)**2)
+    standard_dev = (sum(squared_difference)/10000)**0.5
+    print(f"Standard deviation:{standard_dev}")
+    
+    # plt.boxplot(results, vert=False, patch_artist=False)
+    # plt.show()
 
-        plt.plot(y, row, label = f"Line {k}")
-            # if result > 1:
-            #     results.append("D WIN")
-            # elif result > 0:
-            #     results.append("WIN")
-            # elif result < -1:
-            #     results.append("D LOSS")
-            # elif result < 0:
-            #     results.append("LOSS")
-            # else:
-            #     results.append("PUSH")
-    # print(rows)
-    #print(f"Win rate: {(wins/num)*100}%")
-    plt.xlabel("Hand #")
-    plt.ylabel("Result")
-    plt.title("1000 Games of 100 hands")
-    plt.axhline(y = 0, color = 'r', linestyle = '-') 
+    plt.hist(results, bins=50, edgecolor='black')
+    plt.xlabel('Profit per Game')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Blackjack Game Results')
     plt.show()
-    averageRows(rows)
-    return hand_results
+
+    plt.plot(range(10000), bankrolls)
+    plt.xlabel("Game number")
+    plt.ylabel("Bankroll")
+    plt.title("Bankroll after each Game")
+    plt.show()
+        
+
+    #     plt.plot(y, row, label = f"Line {k}")
+
+    # plt.xlabel("Hand #")
+    # plt.ylabel("Result")
+    # plt.title("1000 Games of 100 hands")
+    # plt.axhline(y = 0, color = 'r', linestyle = '-') 
+    # plt.show()
+    # averageRows(rows)
+    # return hand_results
 
     
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
     # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
-    return win/100000, push/100000, loss/100000, (winnings-10000000)/10000000
+    print( win / 1000000, push / 1000000, loss / 1000000, (winnings - 1000000) / 1000000)
+
+def loop_basic():
+    for i in range(1, 3, 1):
+        print(i)
+        basic_wr, basic_pr, basic_lr, basic_avgprofit = basic_strategy_main(i)
+        print(basic_wr, basic_pr, basic_lr, basic_avgprofit)
+
+
+
 
 def loop_strategy():
     # mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic()
@@ -826,26 +863,10 @@ if choice.lower() == "mimic":
 elif choice.lower() == "never":
     main_never_bust()
 elif choice.lower() == "basic":
-    hand_results = basic_strategy_main()
+    hand_results = basic_strategy_main(1)
 elif choice.lower() == "normal":
     blackjack()
 elif choice.lower() == "loop":
     loop_strategy()
-
-df = pd.DataFrame(hand_results)
-# Running Count vs Bet Scatter Plot
-plt.figure(figsize=(8, 5))
-sb.scatterplot(x=df["running_count"], y=df["bet"])
-plt.xlabel("Running Count")
-plt.ylabel("Bet Size")
-plt.title("Bet Size vs Running Count")
-plt.show()
-
-# Cumulative Winnings Over Time
-plt.figure(figsize=(10, 5))
-plt.plot(df["hand"], df["cumulative_winnings"], label="Cumulative Winnings", color="green")
-plt.xlabel("Hand Number")
-plt.ylabel("Total Winnings")
-plt.title("Cumulative Profit/Loss Over Hands")
-plt.legend()
-plt.show()
+elif choice.lower() == "loopb":
+    loop_basic()
