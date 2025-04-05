@@ -28,10 +28,14 @@ def getBet():
         else:
             return bet
         
-def update_count(card):
+def update_count(card, strategy):
     global running_count
-    card_value = {2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 0, 8: 0, 9: 0, 10: -1, "J": -1, "Q": -1, "K": -1, "A": -1}
-
+    if strategy == "hilo":
+        card_value = {2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 0, 8: 0, 9: 0, 10: -1, "J": -1, "Q": -1, "K": -1, "A": -1}
+    elif strategy == "omega":
+        card_value = {2: 1, 3: 1, 7: 1, 4: 2, 5: 2, 6: 2, 9: -1, 10: -2, "J": -2, "Q": -2, "K": -2, "A": -2, 8: 0}
+    elif strategy == "wong":
+        card_value = {3: 1, 4: 1, 6: 1, 2: 0.5, 7: 0.5, 5: 1.5, 8: 0, 9:-0.5, 10: -1, "J": -1, "Q": -1, "K": -1, "A": -1}
     running_count += card_value.get(card[0], 0)
 
 
@@ -108,7 +112,7 @@ def never_bust_blackjack(playerHand, dealerHand, shuffledDeck):
             #print("PLAYER WIN")
             return 1
         
-def bs_blackjack(playerHand, dealerHand, shuffledDeck):
+def bs_blackjack(playerHand, dealerHand, shuffledDeck, strategy):
     hasSplit = False
     #print(f"Player hand: {playerHand}")
     #print(f"Dealer card: {dealerHand[0]}")
@@ -122,11 +126,11 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck):
         #print("Player wins 3/2 payout")
         return 1.5
     else:
-        playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit)
+        playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy)
         if mult < 0:
             #print("Player bust")
             return -1
-        dealerPlay(dealerHand, shuffledDeck)
+        dealerPlay(dealerHand, shuffledDeck, strategy)
         #print(calculateCount(playerHand, dealerHand))
         #print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
@@ -290,14 +294,14 @@ def playHand(playerHand, shuffledDeck):
             elif action.lower() == "stand":
                 return 1
             
-def dealerPlay(dealerHand, shuffledDeck):
+def dealerPlay(dealerHand, shuffledDeck, strategy):
     global running_count
     #print(f"Dealers hand: {dealerHand}")
     while handValue(dealerHand) < 17:
         card = shuffledDeck.pop()
         
         dealerHand.append(card)
-        update_count(card)
+        update_count(card, strategy)
         #print(f"Dealers hand: {dealerHand}")
 
 
@@ -356,7 +360,7 @@ def never_bust(playerHand, shuffledDeck):
         #print(playerHand)
     return playerHand
     
-def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
+def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy):
     global running_count
     count = 0
     if dealerHand[0][0] in ['J', 'Q', 'K']:
@@ -475,7 +479,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
             if action == "Yes":
                 #print("SPLITTT")
                 counter += 1
-                return playerHand, bs_split(playerHand, dealerHand, shuffledDeck)
+                return playerHand, bs_split(playerHand, dealerHand, shuffledDeck, strategy)
             counter += 1
         if handType(playerHand) == "soft" and playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
             #print("SOFT")
@@ -499,13 +503,13 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
             if action == "Hit":
                 card = shuffledDeck.pop()
                 playerHand.append(card)
-                update_count(card)
+                update_count(card, strategy)
                 #print(f"AFTER HIT: {playerHand}")
             elif action == "Double":
                 card = shuffledDeck.pop()
 
                 playerHand.append(card)
-                update_count(card)
+                update_count(card, strategy)
                 completed = True
                 return playerHand, 2
             elif action == "Stand":
@@ -523,12 +527,12 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
             if action == "Hit":
                 card = shuffledDeck.pop()
                 playerHand.append(card)
-                update_count(card)
+                update_count(card, strategy)
                 #print(f"AFTER HIT: {playerHand}")
             elif action == "Double":
                 card = shuffledDeck.pop()
                 playerHand.append(card)
-                update_count(card)
+                update_count(card, strategy)
                 #print(f"AFTER DOUBLE: {playerHand}")
                 completed = True
                 return playerHand, 2
@@ -538,20 +542,20 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit):
                 completed = True
                 return playerHand, 1
 
-def bs_split(playerHand, dealerHand, shuffledDeck):
+def bs_split(playerHand, dealerHand, shuffledDeck, strategy):
 
 
     hasSplit = True
     # print("SPLIT AND CALLING FUNCTIONS")
     card1 = shuffledDeck.pop()
     card2 = shuffledDeck.pop()
-    update_count(card1)
-    update_count(card2)
+    update_count(card1, strategy)
+    update_count(card2, strategy)
     playerHand2 = [playerHand.pop()]
     playerHand.append(card1)
     playerHand2.append(card2)
-    hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit)
-    hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck, hasSplit)
+    hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy)
+    hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck, hasSplit, strategy)
 
     total = result1 + result2
 
@@ -719,8 +723,19 @@ def get_bet(true_count, bet_type):
             return 9
         else:
             return 12
+    elif bet_type == 3:
+        if true_count <= 0:
+            return 1
+        elif true_count == 1:
+            return 4
+        elif true_count ==2:
+            return 8
+        elif true_count == 3:
+            return 12
+        else:
+            return 16
     
-def basic_strategy_main(bet_type):
+def basic_strategy_main(bet_type, strategy):
     global running_count
     results = []
     bankrolls = []
@@ -731,9 +746,12 @@ def basic_strategy_main(bet_type):
     win = 0
     push = 0
     loss = 0 
+    ruin_count = 0
+
     
     num = 100#int(input("How many hands: "))
     for k in range(10000):
+        ruined = False
         bankroll = 100
 
         #print(k)
@@ -757,14 +775,14 @@ def basic_strategy_main(bet_type):
             for j in range(2):
                 card = deck.pop()
                 playerHand.append(card)
-                update_count(card)  
+                update_count(card, strategy)  
 
                 card = deck.pop()
                 dealerHand.append(card)
-                update_count(card)  
+                update_count(card, strategy)  
 
             #print(f"CARDS LEFT: {len(deck)}")
-            result = bs_blackjack(playerHand, dealerHand, deck) * bet
+            result = bs_blackjack(playerHand, dealerHand, deck, strategy) * bet
             bankroll += result
             pot += result
             row.append(pot)
@@ -776,11 +794,13 @@ def basic_strategy_main(bet_type):
             elif result < 0:
                 loss += 1
             y.append(i)
+            if bankroll < 0:
+                ruined = True
+                break
+        if ruined:
+            ruin_count += 1
+
         results.append(pot)
-        
-        
-
-
         bankrolls.append(bankroll)
 
         #print("Game DONE")
@@ -796,21 +816,22 @@ def basic_strategy_main(bet_type):
         squared_difference.append((i-mean)**2)
     standard_dev = (sum(squared_difference)/10000)**0.5
     print(f"Standard deviation:{standard_dev}")
+    print(f"Amount ruined: {ruin_count}")
     
     # plt.boxplot(results, vert=False, patch_artist=False)
     # plt.show()
 
-    plt.hist(results, bins=50, edgecolor='black')
-    plt.xlabel('Profit per Game')
-    plt.ylabel('Frequency')
-    plt.title('Distribution of Blackjack Game Results')
-    plt.show()
+    # plt.hist(results, bins=50, edgecolor='black')
+    # plt.xlabel('Profit per Game')
+    # plt.ylabel('Frequency')
+    # plt.title('Distribution of Blackjack Game Results')
+    # plt.show()
 
-    plt.plot(range(10000), bankrolls)
-    plt.xlabel("Game number")
-    plt.ylabel("Bankroll")
-    plt.title("Bankroll after each Game")
-    plt.show()
+    # plt.plot(range(10000), bankrolls)
+    # plt.xlabel("Game number")
+    # plt.ylabel("Bankroll")
+    # plt.title("Bankroll after each Game")
+    # plt.show()
         
 
     #     plt.plot(y, row, label = f"Line {k}")
@@ -826,13 +847,22 @@ def basic_strategy_main(bet_type):
     
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
     # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
-    print( win / 1000000, push / 1000000, loss / 1000000, (winnings - 1000000) / 1000000)
+    return( win / 1000000, push / 1000000, loss / 1000000, (winnings - 1000000) / 1000000, ruin_count/1000000)
 
 def loop_basic():
-    for i in range(1, 3, 1):
-        print(i)
-        basic_wr, basic_pr, basic_lr, basic_avgprofit = basic_strategy_main(i)
-        print(basic_wr, basic_pr, basic_lr, basic_avgprofit)
+    
+    strategies = ["hilo", "omega", "wong"]
+    for strategy in strategies:
+        avgprofit = []
+        rateruin = []
+        for i in range(1, 4, 1):
+            print(i)
+            basic_wr, basic_pr, basic_lr, basic_avgprofit, basic_ruin = basic_strategy_main(i, strategy)
+            #print(basic_wr, basic_pr, basic_lr, basic_avgprofit)
+            avgprofit.append(basic_avgprofit)
+            rateruin.append(basic_ruin)
+        formatted = [f"{x:.6f}" for x in rateruin]
+        print(f"Strategy: {strategy} Average profit of each bet: {avgprofit}\n Rate of ruin: {formatted}")
 
 
 

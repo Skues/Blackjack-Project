@@ -34,3 +34,17 @@ Basic Strategy: 43.461% WR, 43.268% WR
 
  Win rate  Push rate  Loss rate  Profit p hand
 0   43.5457    8.66611   47.78819      -0.472269
+
+Betting strategy: [1-8, 1-12, 1-16]
+Average profit: [0.207068, 0.6127565, 0.9867375]
+Rate of ruin: ['0.000049', '0.000380', '0.001029']
+
+
+Strategy: hilo Average profit of each bet: [0.205053, 0.610403, 0.975794]
+Rate of ruin: ['0.000048', '0.000415', '0.001016']
+
+Strategy: omega Average profit of each bet: [0.0191355, 0.2995525, 0.5786145]
+Rate of ruin: ['0.000020', '0.000245', '0.000756']
+
+Strategy: wong Average profit of each bet: [0.632443, 1.199993, 1.665619]
+Rate of ruin: ['0.000317', '0.001233', '0.002302']
