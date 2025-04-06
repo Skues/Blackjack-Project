@@ -2,6 +2,7 @@ import random
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sb
+import numpy as np
 hasSplit = False
 
 # def printFunc(cards):
@@ -700,7 +701,9 @@ def main_never_bust():
     return win/10000, push/10000, loss/10000, (winnings-1000000)/1000000
 
 
-def get_bet(true_count, bet_type):
+def get_bet(running_count, bet_type, deck):
+    true_count = running_count/(len(deck)/52)
+    true_count = round(true_count)
     if bet_type == 1:
         if true_count <= 0:
             return 1
@@ -735,8 +738,20 @@ def get_bet(true_count, bet_type):
         else:
             return 16
     
+def create_multiple_decks(numDeck):
+    deck_all = []
+    for i in range(numDeck):
+        deck_all.append(createDeck())
+
+    flat_list = [item for sublist in deck_all for item in sublist]
+    return flat_list
+
+    
+    deck2 = random.shuffle(flat_list)
 def basic_strategy_main(bet_type, strategy):
     global running_count
+    decks = 6
+    deck_all = []
     results = []
     bankrolls = []
     hand_results = []
@@ -747,8 +762,8 @@ def basic_strategy_main(bet_type, strategy):
     push = 0
     loss = 0 
     ruin_count = 0
-
-    
+    penetration = 0.75
+    cut_card = decks*52*penetration
     num = 100#int(input("How many hands: "))
     for k in range(10000):
         ruined = False
@@ -760,16 +775,21 @@ def basic_strategy_main(bet_type, strategy):
         row = []
         y = []
         
-        deck = shuffleDeck(createDeck())
+        # deck = shuffleDeck(createDeck())
+        deck = create_multiple_decks(decks)
+        random.shuffle(deck)
         running_count = 0
         for i in range(num):
             
             #print(f"Hand number: {i}")
-            if len(deck) <= 12:
+            if len(deck) <= cut_card:
                 #print("Reshuffling deck")
-                deck = shuffleDeck(createDeck())
+                # deck = shuffleDeck(createDeck())
+                deck = create_multiple_decks(decks)
+                random.shuffle(deck)
+
                 running_count = 0
-            bet = get_bet(running_count, bet_type)
+            bet = get_bet(running_count, bet_type, deck)
             playerHand = []
             dealerHand = []
             for j in range(2):
@@ -852,7 +872,24 @@ def basic_strategy_main(bet_type, strategy):
 def loop_basic():
     
     strategies = ["hilo", "omega", "wong"]
+    betting_labels = ["Betting 1", "Betting 2", "Betting 3"]
+    bar_width = 0.25
+    
+    # Set up the figure with appropriate size
+    fig, axs = plt.subplots(3, 1, figsize=(10, 15))
+    titles = ["Win Rates", "Push Rates", "Loss Rates"]
+
+    win_rates = []
+    push_rates = []
+    loss_rates = []
+    avgprofit_list = []
+    rateruin_list = []
+
+
     for strategy in strategies:
+        wins = []
+        pushes = []
+        losses = []
         avgprofit = []
         rateruin = []
         for i in range(1, 4, 1):
@@ -861,10 +898,118 @@ def loop_basic():
             #print(basic_wr, basic_pr, basic_lr, basic_avgprofit)
             avgprofit.append(basic_avgprofit)
             rateruin.append(basic_ruin)
+            wins.append(basic_wr)
+            pushes.append(basic_pr)
+            losses.append(basic_lr)
+    
+        win_rates.append(wins)
+        push_rates.append(pushes)
+        loss_rates.append(losses)
+        avgprofit_list.append(avgprofit)
+        rateruin_list.append(rateruin)
+
+
         formatted = [f"{x:.6f}" for x in rateruin]
         print(f"Strategy: {strategy} Average profit of each bet: {avgprofit}\n Rate of ruin: {formatted}")
 
-
+    # Create a more informative visualization
+    fig, axs = plt.subplots(2, 2, figsize=(16, 12))
+    
+    # 1. Stacked bar chart showing win/push/loss composition for each strategy-betting combo
+    ax = axs[0, 0]
+    x = np.arange(len(strategies) * len(betting_labels))
+    width = 0.8
+    
+    labels = []
+    for s in strategies:
+        for b in betting_labels:
+            labels.append(f"{s}\n{b}")
+    
+    bottoms = np.zeros(len(strategies) * len(betting_labels))
+    win_data = []
+    push_data = []
+    loss_data = []
+    
+    for i, strat in enumerate(strategies):
+        for j, bet in enumerate(betting_labels):
+            idx = i * len(betting_labels) + j
+            win_data.append(win_rates[i][j])
+            push_data.append(push_rates[i][j])
+            loss_data.append(loss_rates[i][j])
+    
+    ax.bar(x, win_data, width, label='Win Rate')
+    ax.bar(x, push_data, width, bottom=win_data, label='Push Rate')
+    bottoms = np.array(win_data) + np.array(push_data)
+    ax.bar(x, loss_data, width, bottom=bottoms, label='Loss Rate')
+    
+    ax.set_title('Outcome Distribution by Strategy and Betting Method')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, rotation=45, ha='right')
+    ax.set_ylabel('Proportion')
+    ax.legend()
+    
+    # 2. Heatmap of win rates
+    ax = axs[0, 1]
+    win_array = np.array(win_rates)
+    im = ax.imshow(win_array, cmap='YlGn')
+    
+    # Add labels
+    ax.set_xticks(np.arange(len(betting_labels)))
+    ax.set_yticks(np.arange(len(strategies)))
+    ax.set_xticklabels(betting_labels)
+    ax.set_yticklabels(strategies)
+    ax.set_title('Win Rate Heatmap')
+    
+    # Add colorbar
+    cbar = ax.figure.colorbar(im, ax=ax)
+    
+    # 3. Average profit comparison
+    ax = axs[1, 0]
+    x = np.arange(len(betting_labels))
+    width = 0.25
+    
+    for i, strategy in enumerate(strategies):
+        ax.bar(x + (i-1)*width, avgprofit_list[i], width, label=strategy)
+    
+    ax.set_title('Average Profit by Strategy and Betting Method')
+    ax.set_xticks(x)
+    ax.set_xticklabels(betting_labels)
+    ax.set_ylabel('Average Profit')
+    ax.legend()
+    
+    # 4. Ruin rate comparison
+    ax = axs[1, 1]
+    x = np.arange(len(betting_labels))
+    width = 0.25
+    
+    for i, strategy in enumerate(strategies):
+        ax.bar(x + (i-1)*width, rateruin_list[i], width, label=strategy)
+    
+    ax.set_title('Ruin Rate by Strategy and Betting Method')
+    ax.set_xticks(x)
+    ax.set_xticklabels(betting_labels)
+    ax.set_ylabel('Ruin Rate')
+    ax.legend()
+    
+    plt.tight_layout()
+    plt.show()
+    
+    # Find and print the best and worst combinations
+    win_array = np.array(win_rates)
+    loss_array = np.array(loss_rates)
+    profit_array = np.array(avgprofit_list)
+    ruin_array = np.array(rateruin_list)
+    
+    best_win_idx = np.unravel_index(win_array.argmax(), win_array.shape)
+    worst_loss_idx = np.unravel_index(loss_array.argmax(), loss_array.shape)
+    best_profit_idx = np.unravel_index(profit_array.argmax(), profit_array.shape)
+    lowest_ruin_idx = np.unravel_index(ruin_array.argmin(), ruin_array.shape)
+    
+    print(f"Best win rate: {strategies[best_win_idx[0]]} with {betting_labels[best_win_idx[1]]} - {win_array[best_win_idx]:.2f}")
+    print(f"Worst loss rate: {strategies[worst_loss_idx[0]]} with {betting_labels[worst_loss_idx[1]]} - {loss_array[worst_loss_idx]:.2f}")
+    print(f"Best profit: {strategies[best_profit_idx[0]]} with {betting_labels[best_profit_idx[1]]} - {profit_array[best_profit_idx]:.2f}")
+    print(f"Lowest ruin rate: {strategies[lowest_ruin_idx[0]]} with {betting_labels[lowest_ruin_idx[1]]} - {ruin_array[lowest_ruin_idx]:.2f}")
+    
 
 
 def loop_strategy():

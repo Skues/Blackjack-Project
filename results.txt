@@ -40,11 +40,22 @@ Average profit: [0.207068, 0.6127565, 0.9867375]
 Rate of ruin: ['0.000049', '0.000380', '0.001029']
 
 
-Strategy: hilo Average profit of each bet: [0.205053, 0.610403, 0.975794]
+Strategy: hilo Average profit of per hand: [0.205053, 0.610403, 0.975794]
 Rate of ruin: ['0.000048', '0.000415', '0.001016']
 
-Strategy: omega Average profit of each bet: [0.0191355, 0.2995525, 0.5786145]
+Strategy: omega Average profit of per hand: [0.0191355, 0.2995525, 0.5786145]
 Rate of ruin: ['0.000020', '0.000245', '0.000756']
 
-Strategy: wong Average profit of each bet: [0.632443, 1.199993, 1.665619]
+Strategy: wong Average profit of per hand: [0.632443, 1.199993, 1.665619]
 Rate of ruin: ['0.000317', '0.001233', '0.002302']
+
+6 DECKS:
+
+Strategy: hilo Average profit of per hand: [-0.2666805, -0.094556, 0.0710365]
+Rate of ruin: ['0.000000', '0.000010', '0.000075']
+
+Strategy: omega Average profit of per hand: [-0.3095265, -0.1841035, -0.058634]
+Rate of ruin: ['0.000001', '0.000023', '0.000100']
+
+Strategy: wong Average profit of per hand: [-0.2512725, -0.076408, 0.0996105]
+Rate of ruin: ['0.000000', '0.000016', '0.000105']
