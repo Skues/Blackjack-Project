@@ -750,7 +750,9 @@ def create_multiple_decks(numDeck):
     deck2 = random.shuffle(flat_list)
 def basic_strategy_main(bet_type, strategy):
     global running_count
-    decks = 6
+    decks = 4
+    money = 0
+    day_change = []
     deck_all = []
     results = []
     bankrolls = []
@@ -806,6 +808,7 @@ def basic_strategy_main(bet_type, strategy):
             bankroll += result
             pot += result
             row.append(pot)
+            money += result
             if result == 0:
                 push += 1
             elif result > 0:
@@ -819,6 +822,7 @@ def basic_strategy_main(bet_type, strategy):
                 break
         if ruined:
             ruin_count += 1
+        day_change.append(money)
 
         results.append(pot)
         bankrolls.append(bankroll)
@@ -837,6 +841,7 @@ def basic_strategy_main(bet_type, strategy):
     standard_dev = (sum(squared_difference)/10000)**0.5
     print(f"Standard deviation:{standard_dev}")
     print(f"Amount ruined: {ruin_count}")
+    print(f"Final money: {money}")
     
     # plt.boxplot(results, vert=False, patch_artist=False)
     # plt.show()
@@ -867,7 +872,7 @@ def basic_strategy_main(bet_type, strategy):
     
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
     # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
-    return( win / 1000000, push / 1000000, loss / 1000000, (winnings - 1000000) / 1000000, ruin_count/1000000)
+    return( win / 1000000, push / 1000000, loss / 1000000, (winnings - 1000000) / 1000000, ruin_count/1000000, day_change)
 
 def loop_basic():
     
@@ -884,6 +889,7 @@ def loop_basic():
     loss_rates = []
     avgprofit_list = []
     rateruin_list = []
+    day_changes_all = []
 
 
     for strategy in strategies:
@@ -892,21 +898,24 @@ def loop_basic():
         losses = []
         avgprofit = []
         rateruin = []
+        day_changes = []
         for i in range(1, 4, 1):
             print(i)
-            basic_wr, basic_pr, basic_lr, basic_avgprofit, basic_ruin = basic_strategy_main(i, strategy)
+            basic_wr, basic_pr, basic_lr, basic_avgprofit, basic_ruin, day_change = basic_strategy_main(i, strategy)
             #print(basic_wr, basic_pr, basic_lr, basic_avgprofit)
             avgprofit.append(basic_avgprofit)
             rateruin.append(basic_ruin)
             wins.append(basic_wr)
             pushes.append(basic_pr)
             losses.append(basic_lr)
+            day_changes.append(day_change)
     
         win_rates.append(wins)
         push_rates.append(pushes)
         loss_rates.append(losses)
         avgprofit_list.append(avgprofit)
         rateruin_list.append(rateruin)
+        day_changes_all.append(day_changes)
 
 
         formatted = [f"{x:.6f}" for x in rateruin]
@@ -917,8 +926,7 @@ def loop_basic():
     
     # 1. Stacked bar chart showing win/push/loss composition for each strategy-betting combo
     ax = axs[0, 0]
-    x = np.arange(len(strategies) * len(betting_labels))
-    width = 0.8
+    
     
     labels = []
     for s in strategies:
@@ -936,16 +944,16 @@ def loop_basic():
             win_data.append(win_rates[i][j])
             push_data.append(push_rates[i][j])
             loss_data.append(loss_rates[i][j])
+            day_change = day_changes_all[i][j]
+            days = np.arange(len(day_change))
+            ax.plot(days, day_change, label=f"{strat}-{bet}")
     
-    ax.bar(x, win_data, width, label='Win Rate')
-    ax.bar(x, push_data, width, bottom=win_data, label='Push Rate')
-    bottoms = np.array(win_data) + np.array(push_data)
-    ax.bar(x, loss_data, width, bottom=bottoms, label='Loss Rate')
     
-    ax.set_title('Outcome Distribution by Strategy and Betting Method')
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, rotation=45, ha='right')
-    ax.set_ylabel('Proportion')
+    
+    ax.set_title('Daily Money Changes Over Time')
+    ax.set_xlabel('Day')
+    ax.set_ylabel('Money Won/Lost')
+    ax.axhline(y=0, color='r', linestyle='-', alpha=0.3)  # Zero line
     ax.legend()
     
     # 2. Heatmap of win rates
@@ -961,7 +969,7 @@ def loop_basic():
     ax.set_title('Win Rate Heatmap')
     
     # Add colorbar
-    cbar = ax.figure.colorbar(im, ax=ax)
+    ax.figure.colorbar(im, ax=ax)
     
     # 3. Average profit comparison
     ax = axs[1, 0]
