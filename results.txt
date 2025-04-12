@@ -34,11 +34,11 @@ Basic Strategy: 43.461% WR, 43.268% WR
 
  Win rate  Push rate  Loss rate  Profit p hand
 0   43.5457    8.66611   47.78819      -0.472269
+1 DECK
 
 Betting strategy: [1-8, 1-12, 1-16]
 Average profit: [0.207068, 0.6127565, 0.9867375]
 Rate of ruin: ['0.000049', '0.000380', '0.001029']
-
 
 Strategy: hilo Average profit of per hand: [0.205053, 0.610403, 0.975794]
 Rate of ruin: ['0.000048', '0.000415', '0.001016']
@@ -59,3 +59,5 @@ Rate of ruin: ['0.000001', '0.000023', '0.000100']
 
 Strategy: wong Average profit of per hand: [-0.2512725, -0.076408, 0.0996105]
 Rate of ruin: ['0.000000', '0.000016', '0.000105']
+
+CHANGE GRAPH TO AVERAGE PROFIT YES YES 

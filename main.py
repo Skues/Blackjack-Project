@@ -128,6 +128,8 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck, strategy):
         return 1.5
     else:
         playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy)
+        if playerHand == "split":
+            return mult
         if mult < 0:
             #print("Player bust")
             return -1
@@ -480,7 +482,7 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy):
             if action == "Yes":
                 #print("SPLITTT")
                 counter += 1
-                return playerHand, bs_split(playerHand, dealerHand, shuffledDeck, strategy)
+                return "split", bs_split(playerHand, dealerHand, shuffledDeck, strategy)
             counter += 1
         if handType(playerHand) == "soft" and playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
             #print("SOFT")
@@ -552,11 +554,47 @@ def bs_split(playerHand, dealerHand, shuffledDeck, strategy):
     card2 = shuffledDeck.pop()
     update_count(card1, strategy)
     update_count(card2, strategy)
+
     playerHand2 = [playerHand.pop()]
     playerHand.append(card1)
     playerHand2.append(card2)
-    hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy)
-    hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck, hasSplit, strategy)
+    if blackjackCheck(playerHand):
+        result1 = 1.5
+    else:
+        hand1, result1 = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy)
+    if blackjackCheck(playerHand2):
+        result2 = 1.5
+    else:
+        hand2, result2 = basic_strategy(playerHand2, dealerHand, shuffledDeck, hasSplit, strategy)
+
+    if result1 < 0 and result2 < 0:
+        return result1 + result2
+    dealerPlay(dealerHand, shuffledDeck, strategy)
+
+    if result1 >= 0:
+        if handValue(dealerHand) > 21:
+            result1 = abs(result1)
+        elif blackjackCheck(playerHand):
+            pass  # Keep blackjack payout
+        elif handValue(dealerHand) > handValue(playerHand):
+            result1 = -1 * abs(result1)
+        elif handValue(dealerHand) < handValue(playerHand):
+            result1 = abs(result1)
+        else:
+            result1 = 0  # Push
+    
+    # Evaluate second hand result if it didn't bust
+    if result2 >= 0:
+        if handValue(dealerHand) > 21:
+            result2 = abs(result2)
+        elif blackjackCheck(playerHand2):
+            pass  # Keep blackjack payout
+        elif handValue(dealerHand) > handValue(playerHand2):
+            result2 = -1 * abs(result2)
+        elif handValue(dealerHand) < handValue(playerHand2):
+            result2 = abs(result2)
+        else:
+            result2 = 0
 
     total = result1 + result2
 
@@ -609,7 +647,7 @@ def averageRows(rows):
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 10000 games")
-    plt.axhline(y = 0, color = 'r', linestyle = '-') 
+    # plt.axhline(y = 0, color = 'r', linestyle = '-') 
     plt.show()
 
 
@@ -702,41 +740,44 @@ def main_never_bust():
 
 
 def get_bet(running_count, bet_type, deck):
-    true_count = running_count/(len(deck)/52)
-    true_count = round(true_count)
+    decks_remaining = len(deck)/52
+
+    true_count = running_count/decks_remaining if decks_remaining > 0 else 0
+    if bet_type == 0:
+        return 1, true_count
     if bet_type == 1:
         if true_count <= 0:
-            return 1
-        elif true_count == 1:
-            return 2
-        elif true_count ==2:
-            return 4
-        elif true_count == 3:
-            return 6
+            return 1, true_count
+        elif true_count <= 1:
+            return 2, true_count
+        elif true_count <=2:
+            return 4, true_count
+        elif true_count <= 3:
+            return 6, true_count
         else:
-            return 8
+            return 8, true_count
     elif bet_type == 2:
         if true_count <= 0:
-            return 1
-        elif true_count == 1:
-            return 3
-        elif true_count ==2:
-            return 6
-        elif true_count == 3:
-            return 9
+            return 1, true_count
+        elif true_count <= 1:
+            return 3, true_count
+        elif true_count <=2:
+            return 6, true_count
+        elif true_count <= 3:
+            return 9, true_count
         else:
-            return 12
+            return 12, true_count
     elif bet_type == 3:
         if true_count <= 0:
-            return 1
-        elif true_count == 1:
-            return 4
-        elif true_count ==2:
-            return 8
-        elif true_count == 3:
-            return 12
+            return 1, true_count
+        elif true_count <= 1:
+            return 4, true_count
+        elif true_count <=2:
+            return 8, true_count
+        elif true_count <= 3:
+            return 12, true_count
         else:
-            return 16
+            return 16, true_count
     
 def create_multiple_decks(numDeck):
     deck_all = []
@@ -750,7 +791,8 @@ def create_multiple_decks(numDeck):
     deck2 = random.shuffle(flat_list)
 def basic_strategy_main(bet_type, strategy):
     global running_count
-    decks = 4
+    truecountseen = []
+    decks = 6
     money = 0
     day_change = []
     deck_all = []
@@ -767,9 +809,10 @@ def basic_strategy_main(bet_type, strategy):
     penetration = 0.75
     cut_card = decks*52*penetration
     num = 100#int(input("How many hands: "))
+    avgprofitperhand = 0
     for k in range(10000):
         ruined = False
-        bankroll = 100
+        #money -= 100
 
         #print(k)
         hasSplit = False
@@ -791,7 +834,8 @@ def basic_strategy_main(bet_type, strategy):
                 random.shuffle(deck)
 
                 running_count = 0
-            bet = get_bet(running_count, bet_type, deck)
+            bet, true_count = get_bet(running_count, bet_type, deck)
+            truecountseen.append([bet, true_count])
             playerHand = []
             dealerHand = []
             for j in range(2):
@@ -805,9 +849,10 @@ def basic_strategy_main(bet_type, strategy):
 
             #print(f"CARDS LEFT: {len(deck)}")
             result = bs_blackjack(playerHand, dealerHand, deck, strategy) * bet
-            bankroll += result
+            # bankroll += result
             pot += result
-            row.append(pot)
+            row.append(result)
+            
             money += result
             if result == 0:
                 push += 1
@@ -817,21 +862,24 @@ def basic_strategy_main(bet_type, strategy):
             elif result < 0:
                 loss += 1
             y.append(i)
-            if bankroll < 0:
-                ruined = True
-                break
-        if ruined:
-            ruin_count += 1
+
+            
+        # if ruined:
+        #     ruin_count += 1
         day_change.append(money)
 
         results.append(pot)
-        bankrolls.append(bankroll)
-
+        # bankrolls.append(bankroll)
         #print("Game DONE")
         #print(row)
         rows.append(row)
         # print(k, row)
     mean = sum(results)/10000
+    array = []
+    for row in rows:
+        array.append(sum(row)/100)
+    avgprofitperhand = (sum(array)/10000)
+    print(f"Average profit per hand: {avgprofitperhand}")
     print(mean)
     print(min(results))
     print(max(results))
@@ -868,11 +916,47 @@ def basic_strategy_main(bet_type, strategy):
     # plt.show()
     # averageRows(rows)
     # return hand_results
+    print(max(truecountseen))
+    bet_values = [bet for bet, _ in truecountseen]
+    true_count_values = [true_count for _, true_count in truecountseen]
+    # averageRows(rows)
 
+    # Plotting
+    # plt.figure(figsize=(10, 6))
+    # plt.scatter(bet_values, true_count_values, color='blue', alpha=0.5)
+    # plt.title('True Count vs Bet Value')
+    # plt.xlabel('Bet Value')
+    # plt.ylabel('True Count')
+    # plt.grid(True)
+    # plt.show()
     
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
     # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
-    return( win / 1000000, push / 1000000, loss / 1000000, (winnings - 1000000) / 1000000, ruin_count/1000000, day_change)
+    return( win / 1000000, push / 1000000, loss / 1000000, avgprofitperhand, ruin_count/1000000, day_change)
+
+def plot_avgprofit_comparison(avgprofit_list, strategies):
+    betting_labels = ["Betting 1", "Betting 2", "Betting 3", "Betting 4"]
+    num_bets = len(betting_labels)
+    num_strats = len(strategies)
+    bar_width = 0.2
+
+    # X-axis positions for each group of bars
+    x = np.arange(num_bets)
+
+    # Create a bar for each strategy
+    plt.figure(figsize=(12, 6))
+    for i, (avgprofits, strategy) in enumerate(zip(avgprofit_list, strategies)):
+        offset = (i - (num_strats - 1)/2) * bar_width  # centers the bars
+        plt.bar(x + offset, avgprofits, width=bar_width, label=strategy)
+
+    plt.xlabel("Betting Strategies")
+    plt.ylabel("Average Profit")
+    plt.title("Average Profit Comparison Across Card Counting and Betting Strategies")
+    plt.xticks(x, betting_labels)
+    plt.legend(title="Card Counting Strategy")
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.show()
 
 def loop_basic():
     
@@ -899,7 +983,7 @@ def loop_basic():
         avgprofit = []
         rateruin = []
         day_changes = []
-        for i in range(1, 4, 1):
+        for i in range(0, 4, 1):
             print(i)
             basic_wr, basic_pr, basic_lr, basic_avgprofit, basic_ruin, day_change = basic_strategy_main(i, strategy)
             #print(basic_wr, basic_pr, basic_lr, basic_avgprofit)
@@ -919,7 +1003,7 @@ def loop_basic():
 
 
         formatted = [f"{x:.6f}" for x in rateruin]
-        print(f"Strategy: {strategy} Average profit of each bet: {avgprofit}\n Rate of ruin: {formatted}")
+        print(f"Strategy: {strategy} \n Rate of ruin: {formatted}")
 
     # Create a more informative visualization
     fig, axs = plt.subplots(2, 2, figsize=(16, 12))
@@ -948,7 +1032,7 @@ def loop_basic():
             days = np.arange(len(day_change))
             ax.plot(days, day_change, label=f"{strat}-{bet}")
     
-    
+    plot_avgprofit_comparison(avgprofit_list, strategies)
     
     ax.set_title('Daily Money Changes Over Time')
     ax.set_xlabel('Day')
@@ -976,14 +1060,6 @@ def loop_basic():
     x = np.arange(len(betting_labels))
     width = 0.25
     
-    for i, strategy in enumerate(strategies):
-        ax.bar(x + (i-1)*width, avgprofit_list[i], width, label=strategy)
-    
-    ax.set_title('Average Profit by Strategy and Betting Method')
-    ax.set_xticks(x)
-    ax.set_xticklabels(betting_labels)
-    ax.set_ylabel('Average Profit')
-    ax.legend()
     
     # 4. Ruin rate comparison
     ax = axs[1, 1]
@@ -1002,6 +1078,7 @@ def loop_basic():
     plt.tight_layout()
     plt.show()
     
+    
     # Find and print the best and worst combinations
     win_array = np.array(win_rates)
     loss_array = np.array(loss_rates)
@@ -1013,10 +1090,12 @@ def loop_basic():
     best_profit_idx = np.unravel_index(profit_array.argmax(), profit_array.shape)
     lowest_ruin_idx = np.unravel_index(ruin_array.argmin(), ruin_array.shape)
     
-    print(f"Best win rate: {strategies[best_win_idx[0]]} with {betting_labels[best_win_idx[1]]} - {win_array[best_win_idx]:.2f}")
-    print(f"Worst loss rate: {strategies[worst_loss_idx[0]]} with {betting_labels[worst_loss_idx[1]]} - {loss_array[worst_loss_idx]:.2f}")
-    print(f"Best profit: {strategies[best_profit_idx[0]]} with {betting_labels[best_profit_idx[1]]} - {profit_array[best_profit_idx]:.2f}")
-    print(f"Lowest ruin rate: {strategies[lowest_ruin_idx[0]]} with {betting_labels[lowest_ruin_idx[1]]} - {ruin_array[lowest_ruin_idx]:.2f}")
+    print(f"Best win rate: {strategies[best_win_idx[0]]} with {betting_labels[best_win_idx[1]]} - {win_array[best_win_idx]:.5f}")
+    print(f"Worst loss rate: {strategies[worst_loss_idx[0]]} with {betting_labels[worst_loss_idx[1]]} - {loss_array[worst_loss_idx]:.5f}")
+    print(f"Best profit: {strategies[best_profit_idx[0]]} with {betting_labels[best_profit_idx[1]]} - {profit_array[best_profit_idx]:.5f}")
+    print(f"Lowest ruin rate: {strategies[lowest_ruin_idx[0]]} with {betting_labels[lowest_ruin_idx[1]]} - {ruin_array[lowest_ruin_idx]:.5f}")
+
+    plot_avgprofit_comparison(avgprofit_list, strategies)
     
 
 
