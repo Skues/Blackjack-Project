@@ -1,7 +1,7 @@
 import random
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sb
+import seaborn as sns
 import numpy as np
 hasSplit = False
 
@@ -65,7 +65,7 @@ def mimic_blackjack(playerHand, dealerHand, shuffledDeck):
             #print("Player bust")
             return -1
         #print("ONE", len(shuffledDeck))
-        dealerPlay(dealerHand, shuffledDeck)
+        dealerPlayCountless(dealerHand, shuffledDeck)
         #print("TWO", len(shuffledDeck))
         #print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
@@ -97,7 +97,7 @@ def never_bust_blackjack(playerHand, dealerHand, shuffledDeck):
             #print("Player bust")
             return -1
         #print("ONE", len(shuffledDeck))
-        dealerPlay(dealerHand, shuffledDeck)
+        dealerPlayCountless(dealerHand, shuffledDeck)
         #print("TWO", len(shuffledDeck))
         #print(f"Player hand: {playerHand} \n Dealer hand: {dealerHand}")
         if handValue(dealerHand) > 21:
@@ -307,6 +307,10 @@ def dealerPlay(dealerHand, shuffledDeck, strategy):
         update_count(card, strategy)
         #print(f"Dealers hand: {dealerHand}")
 
+def dealerPlayCountless(dealerHand, shuffledDeck):
+    while handValue(dealerHand) < 17:
+        card = shuffledDeck.pop()
+        dealerHand.append(card)
 
 def splitFunction(playerHand, shuffledDeck, dealerHand):
     print("HELLOOO")
@@ -659,15 +663,15 @@ def main_mimic():
     loss = 0 
     
     results = []
-    num = 10000#int(input("How many hands: "))
+    num = 100#int(input("How many hands: "))
     rows = []
-    for k in range(1000):
+    for k in range(10000):
         pot = 0
         row = []
         for i in range(num):
             deck = shuffleDeck(createDeck())
             #print(f"Hand number: {i}")
-            if len(deck) < 12:
+            if len(deck) <= 13:
                 
                 deck = shuffleDeck(createDeck())
             playerHand = []
@@ -701,15 +705,15 @@ def main_never_bust():
     rows =[]
     deck = shuffleDeck(createDeck())
     results = []
-    num = 10000#int(input("How many hands: "))
-    for k in range(1000):
+    num = 100#int(input("How many hands: "))
+    for k in range(10000):
         pot = 0
         row = []
         for i in range(num):
             deck = shuffleDeck(createDeck())
 
             #print(f"Hand number: {i}")
-            if len(deck) < 12:
+            if len(deck) <= 13:
                 #print("Reshuffling deck")
                 deck = shuffleDeck(createDeck())
             playerHand = []
@@ -792,7 +796,7 @@ def create_multiple_decks(numDeck):
 def basic_strategy_main(bet_type, strategy):
     global running_count
     truecountseen = []
-    decks = 6
+    decks = 1
     money = 0
     day_change = []
     deck_all = []
@@ -1100,9 +1104,26 @@ def loop_basic():
 
 
 def loop_strategy():
-    # mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic()
-    # neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust()
-    basic_wr, basic_pr, basic_lr, basic_avgprofit = basic_strategy_main()
+    mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic()
+    neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust()
+    basic_wr, basic_pr, basic_lr, basic_avgprofit, temp, temp2 = basic_strategy_main(0, "hilo")
+
+    strategies = ["Mimic", "Never Bust", "Basic Strategy"]
+    metrics = ["Win rate", "Push rate", "Loss rate"]
+
+    data = np.array([
+        [mimic_wr, mimic_pr, mimic_lr],
+        [neverb_wr, neverb_pr, neverb_lr],
+        [basic_wr*100, basic_pr*100, basic_lr*100]
+    ])
+
+    df = pd.DataFrame(data, index=strategies, columns=metrics)
+    plt.figure(figsize=(9, 6))
+    sns.heatmap(df, annot=True, cmap="YlGnBu", fmt=".3f", linewidths=.5)
+    
+    plt.title('Blackjack Strategy Comparison', fontsize=16)
+    plt.tight_layout()
+    plt.show()
 
     basic_data = {"Win rate": [basic_wr],
                   "Push rate": [basic_pr],
