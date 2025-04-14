@@ -796,7 +796,7 @@ def create_multiple_decks(numDeck):
 def basic_strategy_main(bet_type, strategy):
     global running_count
     truecountseen = []
-    decks = 1
+    decks = 6
     money = 0
     day_change = []
     deck_all = []
@@ -883,17 +883,17 @@ def basic_strategy_main(bet_type, strategy):
     for row in rows:
         array.append(sum(row)/100)
     avgprofitperhand = (sum(array)/10000)
-    print(f"Average profit per hand: {avgprofitperhand}")
-    print(mean)
-    print(min(results))
-    print(max(results))
+    #print(f"Average profit per hand: {avgprofitperhand}")
+    #print(mean)
+    #print(min(results))
+    #print(max(results))
     squared_difference = []
     for i in results:
         squared_difference.append((i-mean)**2)
     standard_dev = (sum(squared_difference)/10000)**0.5
     print(f"Standard deviation:{standard_dev}")
-    print(f"Amount ruined: {ruin_count}")
-    print(f"Final money: {money}")
+    #print(f"Amount ruined: {ruin_count}")
+    #print(f"Final money: {money}")
     
     # plt.boxplot(results, vert=False, patch_artist=False)
     # plt.show()
