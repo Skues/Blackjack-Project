@@ -793,10 +793,10 @@ def create_multiple_decks(numDeck):
 
     
     deck2 = random.shuffle(flat_list)
-def basic_strategy_main(bet_type, strategy):
+def basic_strategy_main(bet_type, strategy, decks):
     global running_count
     truecountseen = []
-    decks = 6
+    # decks = 6
     money = 0
     day_change = []
     deck_all = []
@@ -936,7 +936,8 @@ def basic_strategy_main(bet_type, strategy):
     
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
     # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
-    return( win / 1000000, push / 1000000, loss / 1000000, avgprofitperhand, ruin_count/1000000, day_change)
+    print(truecountseen[0])
+    return( win / 1000000, push / 1000000, loss / 1000000, avgprofitperhand, ruin_count/1000000, day_change, truecountseen)
 
 def plot_avgprofit_comparison(avgprofit_list, strategies):
     betting_labels = ["Betting 1", "Betting 2", "Betting 3", "Betting 4"]
@@ -962,6 +963,27 @@ def plot_avgprofit_comparison(avgprofit_list, strategies):
     plt.tight_layout()
     plt.show()
 
+
+def loop_hist(decks):
+    betting_labels = ["Betting 1", "Betting 2", "Betting 3"]
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))  # Create 1 row, 3 columns of subplots
+
+    for subplot_index, strategy_index in enumerate(range(1, 4)):
+        _, _, _, _, _, _, truecountseen = basic_strategy_main(strategy_index, "hilo", decks)
+        bets = [pair[0] for pair in truecountseen]
+        axes[subplot_index].hist(bets, bins=20, edgecolor='black', width=0.8)
+        axes[subplot_index].set_title(betting_labels[subplot_index])
+        axes[subplot_index].set_xlabel("Bet Value")
+        axes[subplot_index].set_ylabel("Frequency")
+        axes[subplot_index].set_xticks([1, 2, 3, 5, 6, 8, 12, 16])
+        axes[subplot_index].set_ylim(0, 650000)
+
+    plt.tight_layout()
+    plt.savefig(f"betting_histograms{decks}.png")
+
+    
+
+    
 def loop_basic():
     
     strategies = ["hilo", "omega", "wong"]
@@ -1153,3 +1175,5 @@ elif choice.lower() == "loop":
     loop_strategy()
 elif choice.lower() == "loopb":
     loop_basic()
+elif choice.lower() == "hist":
+    loop_hist(1)
