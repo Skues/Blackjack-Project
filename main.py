@@ -1,7 +1,7 @@
 import random
 import matplotlib.pyplot as plt
 import pandas as pd
-# import seaborn as sns
+import seaborn as sns
 import numpy as np
 hasSplit = False
 
@@ -475,19 +475,19 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy):
         if handValue(playerHand) > 21:
             completed = True
             return playerHand, -1
-        if hasSplit != True and playerHand[0][0] == playerHand[1][0]:   
-            #print("PAIR")
-            #print(playerHand)
-            action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
-            #print(action)
-            if action == "dk":
-                #print(f"DK ERROR: {playerHand} and {dealerCard}")
-                break
-            if action == "Yes":
-                #print("SPLITTT")
-                counter += 1
-                return "split", bs_split(playerHand, dealerHand, shuffledDeck, strategy)
-            counter += 1
+        # if hasSplit != True and playerHand[0][0] == playerHand[1][0]:   
+        #     #print("PAIR")
+        #     #print(playerHand)
+        #     action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
+        #     #print(action)
+        #     if action == "dk":
+        #         #print(f"DK ERROR: {playerHand} and {dealerCard}")
+        #         break
+        #     if action == "Yes":
+        #         #print("SPLITTT")
+        #         counter += 1
+        #         return "split", bs_split(playerHand, dealerHand, shuffledDeck, strategy)
+        #     counter += 1
         if handType(playerHand) == "soft" and playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
             #print("SOFT")
             #print(handType(playerHand))
@@ -652,7 +652,7 @@ def averageRows(rows):
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 10000 games")
     plt.axhline(y = 0, color = 'r', linestyle = '-') 
-    plt.show()
+    plt.savefig(f"basic no split")
 
 
 
@@ -682,6 +682,7 @@ def main_mimic():
                 dealerHand.append(deck.pop())
             result = mimic_blackjack(playerHand, dealerHand, deck)
             pot += result
+            # row.append(result)
             row.append(pot)
             if result == 0:
                 push += 1
@@ -701,8 +702,8 @@ def main_mimic():
     plt.tight_layout()
 
     # Keep the final plot displayed
-    plt.show()
-    averageRows(rows)
+    # plt.show()
+    # averageRows(rows)
     array = []
     for row in rows:
         array.append(sum(row)/100)
@@ -758,8 +759,8 @@ def main_never_bust():
     plt.title('Pot Progression: Mimic the Dealer')
 
     plt.tight_layout()
-    plt.show()
-    averageRows(rows)
+    # plt.show()
+    # averageRows(rows)
     array = []
     for row in rows:
         array.append(sum(row)/100)
@@ -834,6 +835,7 @@ def basic_strategy_main(bet_type, strategy, decks):
     bankrolls = []
     hand_results = []
     rows = []
+    potss = []
     # results = []
     winnings = 0
     win = 0
@@ -898,11 +900,8 @@ def basic_strategy_main(bet_type, strategy, decks):
             elif result < 0:
                 loss += 1
             y.append(i)
-        plt.plot(y, pots)
-    
-
-
-            
+        # plt.plot(y, pots)
+                
         # if ruined:
         #     ruin_count += 1
         day_change.append(money)
@@ -911,18 +910,18 @@ def basic_strategy_main(bet_type, strategy, decks):
         # bankrolls.append(bankroll)
         #print("Game DONE")
         #print(row)
-
-        rows.append(pots)
+        potss.append(pots)
+        rows.append(row)
         # print(k, row)
-    plt.xlabel('Hand Number')
-    plt.ylabel('Pot')
-    plt.title('Pot Progression for Each 100-Hand Game (10,000 Games)')
-    plt.grid(True)
-    plt.tight_layout()
+    # plt.xlabel('Hand Number')
+    # plt.ylabel('Pot')
+    # plt.title('Pot Progression for Each 100-Hand Game (10,000 Games)')
+    # plt.grid(True)
+    # plt.tight_layout()
 
     # Keep the final plot displayed
-    plt.show()
-    averageRows(rows)
+    # plt.show()
+    averageRows(potss)
     mean = sum(results)/10000
     array = []
     for row in rows:
@@ -1173,20 +1172,20 @@ def loop_basic():
 def loop_strategy():
     mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic()
     neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust()
-    basic_wr, basic_pr, basic_lr, basic_avgprofit, temp, temp2 = basic_strategy_main(0, "hilo")
+    basic_wr, basic_pr, basic_lr, basic_avgprofit, temp, temp2, _ = basic_strategy_main(0, "hilo", 1)
 
     strategies = ["Mimic", "Never Bust", "Basic Strategy"]
-    metrics = ["Win rate", "Push rate", "Loss rate"]
+    metrics = ["Win rate", "Loss rate"]
 
     data = np.array([
-        [mimic_wr, mimic_pr, mimic_lr],
-        [neverb_wr, neverb_pr, neverb_lr],
-        [basic_wr*100, basic_pr*100, basic_lr*100]
+        [mimic_wr, mimic_lr],
+        [neverb_wr,  neverb_lr],
+        [basic_wr*100,  basic_lr*100]
     ])
 
     df = pd.DataFrame(data, index=strategies, columns=metrics)
     plt.figure(figsize=(9, 6))
-    # sns.heatmap(df, annot=True, cmap="YlGnBu", fmt=".3f", linewidths=.5)
+    sns.heatmap(df, annot=True, cmap="YlGnBu", fmt=".3f", linewidths=.5)
     
     plt.title('Blackjack Strategy Comparison', fontsize=16)
     plt.tight_layout()
@@ -1213,6 +1212,7 @@ if choice.lower() == "mimic":
 elif choice.lower() == "never":
     main_never_bust()
 elif choice.lower() == "basic":
+    # for i in [1, 2, 4, 6]:
     hand_results = basic_strategy_main(0, "hilo", 1)
 elif choice.lower() == "normal":
     blackjack()

@@ -108,6 +108,15 @@ Change the axis on the avg profit graphs so they are all the same - helps show t
 Make graphs that show how the change in penetration of the cut card affects the avg profit.
 
 
-Mimic the Dealer: Average profit per hand: -3.1922919999999997
-Never Bust: Average profit per hand: -4.0807
-Basic Strategy: Average profit per hand: 0.023066
+Mimic the Dealer: Average profit per hand: -0.06216299999999987
+Never Bust: Average profit per hand: -0.0818250000000001
+Basic Strategy: Average profit per hand: -0.0022884999999999993
+
+BS no split: Average profit per hand: -0.01052199999999993
+BS no double: Average profit per hand: -0.019948999999999974
+BS no split no double: Average profit per hand: -0.026637
+
+BS with hilo 1 deck - Average profit per hand: 0.010239500000000016
+BS with hilo 2 deck - Average profit per hand: 0.008067500000000026
+BS with hilo 4 deck - Average profit per hand: -0.006639999999999985
+BS with hilo 6 deck - Average profit per hand: -0.00949850000000001
