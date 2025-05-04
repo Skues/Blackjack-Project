@@ -106,3 +106,8 @@ Then increase the decks and show the changes
 Change the axis on the avg profit graphs so they are all the same - helps show the change and easier to read
 
 Make graphs that show how the change in penetration of the cut card affects the avg profit.
+
+
+Mimic the Dealer: Average profit per hand: -3.1922919999999997
+Never Bust: Average profit per hand: -4.0807
+Basic Strategy: Average profit per hand: 0.023066
