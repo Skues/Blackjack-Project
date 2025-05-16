@@ -116,7 +116,36 @@ BS no split: Average profit per hand: -0.01052199999999993
 BS no double: Average profit per hand: -0.019948999999999974
 BS no split no double: Average profit per hand: -0.026637
 
-BS with hilo 1 deck - Average profit per hand: 0.010239500000000016
-BS with hilo 2 deck - Average profit per hand: 0.008067500000000026
-BS with hilo 4 deck - Average profit per hand: -0.006639999999999985
-BS with hilo 6 deck - Average profit per hand: -0.00949850000000001
+BS with hilo 1 deck - Average profit per hand: 0.015229
+BS with hilo 2 deck - Average profit per hand: -0.0002
+BS with hilo 4 deck - Average profit per hand: -0.0043555
+BS with hilo 6 deck - Average profit per hand: -0.0058785
+
+wong 1 deck  : 0.0140545
+wong 2 deck : -0.001257
+wong 4 deck : -0.00671
+wong 6 deck : -0.006901
+
+omega 1 deck  : 0.0163035
+omega 2 deck : 0.002053
+omega 4 deck : -0.00625
+omega 6 deck : -0.007078
+
+deck_ counts = [1, 2, 4, 6]
+
+hilo = [0.015229, -0.0002, -0.0043555, -0.0058785]
+omega = [0.0163035, 0.002053, -0.00625, -0.007078]
+wong = [0.0140545, -0.001257, -0.00671, -0.006901]
+
+hilo bet 1: -0.005221
+hilo bet 2: -0.00365
+hilo bet 3: -0.013423
+
+wong bet 1: -0.0094275
+wong bet 2: -0.001738
+wong bet 3: -0.00444
+
+omega bet 1: -0.008327
+omega bet 2: 0.001445
+omega bet 3: 0.0038825
+
