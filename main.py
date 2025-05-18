@@ -113,7 +113,7 @@ def never_bust_blackjack(playerHand, dealerHand, shuffledDeck):
             #print("PLAYER WIN")
             return 1
         
-def bs_blackjack(playerHand, dealerHand, shuffledDeck, strategy):
+def bs_blackjack(playerHand, dealerHand, shuffledDeck, strategy, split, double):
     hasSplit = False
     #print(f"Player hand: {playerHand}")
     #print(f"Dealer card: {dealerHand[0]}")
@@ -127,7 +127,7 @@ def bs_blackjack(playerHand, dealerHand, shuffledDeck, strategy):
         #print("Player wins 3/2 payout")
         return 1.5
     else:
-        playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy)
+        playerHand, mult = basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy, split, double)
         if playerHand == "split":
             return mult
         if mult < 0:
@@ -367,7 +367,7 @@ def never_bust(playerHand, shuffledDeck):
         #print(playerHand)
     return playerHand
     
-def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy):
+def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy, split=True, double=True):
     global running_count
     count = 0
     if dealerHand[0][0] in ['J', 'Q', 'K']:
@@ -475,19 +475,21 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy):
         if handValue(playerHand) > 21:
             completed = True
             return playerHand, -1
-        if hasSplit != True and playerHand[0][0] == playerHand[1][0]:   
-            #print("PAIR")
-            #print(playerHand)
-            action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
-            #print(action)
-            if action == "dk":
-                #print(f"DK ERROR: {playerHand} and {dealerCard}")
-                break
-            if action == "Yes":
-                #print("SPLITTT")
+        if split:
+            if hasSplit != True and playerHand[0][0] == playerHand[1][0]:   
+                #print("PAIR")
+                #print(playerHand)
+                action = pairSplit.get((playerHand[0][0], playerHand[1][0])).get(dealerCard, "dk")
+                #print(action)
+                if action == "dk":
+                    #print(f"DK ERROR: {playerHand} and {dealerCard}")
+                    break
+                if action == "Yes":
+                    #print("SPLITTT")
+                    counter += 1
+                    return "split", bs_split(playerHand, dealerHand, shuffledDeck, strategy)
                 counter += 1
-                return "split", bs_split(playerHand, dealerHand, shuffledDeck, strategy)
-            counter += 1
+        
         if handType(playerHand) == "soft" and playerHand[0][0] == 'A' or playerHand[1][0] == 'A' and playerHand[0][0] != playerHand[1][0]:
             #print("SOFT")
             #print(handType(playerHand))
@@ -500,7 +502,10 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy):
                     #print(temp, playerHand)
                     break
             playerHand.insert(0, temp)
-            action = softHands.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
+            if double:
+                action = softHands.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
+            else:
+                action =softHands2.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
             #action = softHands2.get((playerHand[0][0], handValue(playerHand[1:])), {}).get(dealerCard, "dk")
             # action = softHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
             if action == "dk":
@@ -526,7 +531,11 @@ def basic_strategy(playerHand, dealerHand, shuffledDeck, hasSplit, strategy):
                 return playerHand, 1
         else:
             #print("HARD")
-            action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+            if double:
+                action = hardHands.get(handValue(playerHand), {}).get(dealerCard, "dk")
+            else:
+                action = hardHands2.get(handValue(playerHand), {}).get(dealerCard, "dk")
+
             if action == "dk":
                 #print(f"DK ERROR: {playerHand} and {dealerCard}")
                 break
@@ -636,7 +645,7 @@ def calculateCount(playerHand, dealerHand):
                 count -= 1
     return count
 
-def averageRows(rows, decks):
+def averageRows(rows, strat):
     averageR = 0 
     avgRow = []
     y = []
@@ -646,18 +655,20 @@ def averageRows(rows, decks):
         averageR /= len(rows)
         avgRow.append(averageR)
         y.append(j)
-    plt.cla()
-    plt.plot(y, avgRow, label = "Average Line")
-    plt.ylim(-5, 5)
+    # plt.cla()
+    #  linestyle=":", linewidth = 3,
+    plt.plot(y, avgRow, label = strat)
+    plt.ylim(-10, 10)
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 10000 games")
-    plt.axhline(y = 0, color = 'r', linestyle = '-') 
-    plt.savefig(f"wongtest{decks}")
+    plt.legend()
+    # plt.axhline(y = 0, color = 'r', linestyle = '-') 
+    plt.savefig(f"all-allfig")
 
 
 
-def main_mimic():
+def main_mimic(strat):
     winnings = 0
     win = 0
     push = 0
@@ -693,18 +704,18 @@ def main_mimic():
             elif result < 0:
                 loss += 1
             y.append(i)
-        plt.plot(y, row)
+        # plt.plot(y, row)
 
         rows.append(row)
-    plt.xlabel('Hand Number')
-    plt.ylabel('Pot')
-    plt.title('Pot Progression: Mimic the Dealer')
+    # plt.xlabel('Hand Number')
+    # plt.ylabel('Pot')
+    # plt.title('Pot Progression: Mimic the Dealer')
 
-    plt.tight_layout()
+    # plt.tight_layout()
 
     # Keep the final plot displayed
     # plt.show()
-    # averageRows(rows)
+    averageRows(rows, strat)
     array = []
     for row in rows:
         array.append(sum(row)/100)
@@ -716,7 +727,7 @@ def main_mimic():
     return win/10000, push/1000000, loss/10000, (winnings-1000000)/1000000
 
 
-def main_never_bust():
+def main_never_bust(strat):
     winnings = 0
     win = 0
     push = 0
@@ -753,15 +764,15 @@ def main_never_bust():
                 loss += 1
             row.append(pot)
             y.append(i)
-        plt.plot(y, row)
+        # plt.plot(y, row)
         rows.append(row)
-    plt.xlabel('Hand Number')
-    plt.ylabel('Pot')
-    plt.title('Pot Progression: Mimic the Dealer')
+    # plt.xlabel('Hand Number')
+    # plt.ylabel('Pot')
+    # plt.title('Pot Progression: Mimic the Dealer')
 
-    plt.tight_layout()
+    # plt.tight_layout()
     # plt.show()
-    # averageRows(rows)
+    averageRows(rows, strat)
     array = []
     for row in rows:
         array.append(sum(row)/100)
@@ -825,7 +836,7 @@ def create_multiple_decks(numDeck):
 
     
     deck2 = random.shuffle(flat_list)
-def basic_strategy_main(bet_type, strategy, decks):
+def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     global running_count
     truecountseen = []
     # decks = 6
@@ -886,7 +897,7 @@ def basic_strategy_main(bet_type, strategy, decks):
                 update_count(card, strategy)  
 
             #print(f"CARDS LEFT: {len(deck)}")
-            result = bs_blackjack(playerHand, dealerHand, deck, strategy) * bet
+            result = bs_blackjack(playerHand, dealerHand, deck, strategy, split, double) * bet
             # bankroll += result
             pot += result
             pots.append(pot)
@@ -928,7 +939,7 @@ def basic_strategy_main(bet_type, strategy, decks):
 
     squared_difference = [(r-mean)**2 for r in avg_results]
     standard_dev = (sum(squared_difference)/len(avg_results))**0.5
-    # averageRows(potss, bet_type)
+    averageRows(potss, strat)
     mean = sum(results)/10000
     array = []
     for row in rows:
@@ -1237,20 +1248,38 @@ if choice.lower() == "mimic":
 elif choice.lower() == "never":
     main_never_bust()
 elif choice.lower() == "basic":
-    avgprofits = []
-    standarddevs = []
+    results = []
+    labels = []
+    strats= ["BS Full", "BS No Split", "BS No Double", "BS No Split or Double"]
+    variants = [
+        {"split": True, "double": True},
+        {"split": False, "double": True},
+        {"split": True, "double": False},
+        {"split": False, "double": False},
+    ]
+    for variant, strat in zip(variants, strats):
+        label = f"Splits: {variant['split']}, Double: {variant['double']}"
+        result = basic_strategy_main(0, "hilo", 1, variant['split'], variant['double'], strat)
+        results.append(result)
+        labels.append(label)
+    mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic("Mimic")
+    neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust("NeverB")
+    # basic_strategy_main(0, "hilo", 1)
+
+    # avgprofits = []
+    # standarddevs = []
     
-    for j in ["hilo", "omega", "wong"]:
-        avgp = []
-        std = []
-        for i in [1, 2, 3]:
-            hand_results = basic_strategy_main(i, j, 6)
-            avgp.append(hand_results[-4])
-            std.append(hand_results[-3])
-        avgprofits.append(avgp)
-        standarddevs.append(std)
-    print(avgprofits)
-    print(standarddevs)
+    # for j in ["hilo", "omega", "wong"]:
+    #     avgp = []
+    #     std = []
+    #     for i in [1, 2, 3]:
+    #         hand_results = basic_strategy_main(i, j, 6)
+    #         avgp.append(hand_results[-4])
+    #         std.append(hand_results[-3])
+    #     avgprofits.append(avgp)
+    #     standarddevs.append(std)
+    # print(avgprofits)
+    # print(standarddevs)
 
 elif choice.lower() == "normal":
     blackjack()
