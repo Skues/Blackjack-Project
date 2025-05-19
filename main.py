@@ -658,13 +658,13 @@ def averageRows(rows, strat):
     # plt.cla()
     #  linestyle=":", linewidth = 3,
     plt.plot(y, avgRow, label = strat)
-    plt.ylim(-10, 10)
+    plt.ylim(-2, 1)
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 10000 games")
     plt.legend()
     # plt.axhline(y = 0, color = 'r', linestyle = '-') 
-    plt.savefig(f"all-allfig")
+    plt.savefig(f"omega-betting-methods")
 
 
 
@@ -1240,7 +1240,20 @@ def plotting():
     plt.tight_layout()
     plt.show()
 
+def newPlot():
+    methods = ["Hi-Lo", "Omega II", "Wong Halves"]
+    avg_profit = [0.0116, 0.0192, 0.0123]
+    std_dev = [0.3486, 0.3644, 0.3458]
+    plt.figure(figsize=(8, 6))
+    plt.bar(methods, avg_profit, yerr=std_dev, capsize=10, color=['skyblue', 'salmon'])
 
+
+    plt.ylabel('Average Profit per Hand')
+    plt.title('Card Counting Method Performance with Standard Deviation')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+
+    plt.show()
 
 choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
 if choice.lower() == "mimic":
@@ -1250,20 +1263,20 @@ elif choice.lower() == "never":
 elif choice.lower() == "basic":
     results = []
     labels = []
-    strats= ["BS Full", "BS No Split", "BS No Double", "BS No Split or Double"]
+    strats= ["Flat Betting", "1-8", "1-12", "1-16"]
+    names  = [0, 1, 2, 3]
     variants = [
         {"split": True, "double": True},
         {"split": False, "double": True},
         {"split": True, "double": False},
         {"split": False, "double": False},
     ]
-    for variant, strat in zip(variants, strats):
-        label = f"Splits: {variant['split']}, Double: {variant['double']}"
-        result = basic_strategy_main(0, "hilo", 1, variant['split'], variant['double'], strat)
+    for name, strat in zip(names, strats):
+        result = basic_strategy_main(name, "omega", 6, True, True, strat)
         results.append(result)
-        labels.append(label)
-    mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic("Mimic")
-    neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust("NeverB")
+        # labels.append(label)
+    # mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic("Mimic")
+    # neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust("NeverB")
     # basic_strategy_main(0, "hilo", 1)
 
     # avgprofits = []
@@ -1281,6 +1294,8 @@ elif choice.lower() == "basic":
     # print(avgprofits)
     # print(standarddevs)
 
+
+
 elif choice.lower() == "normal":
     blackjack()
 elif choice.lower() == "loop":
@@ -1291,3 +1306,7 @@ elif choice.lower() == "hist":
     loop_hist(1)
 elif choice.lower() == "plot":
     plotting()
+elif choice.lower() == "new":
+    newPlot()
+
+
