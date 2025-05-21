@@ -658,14 +658,14 @@ def averageRows(rows, strat):
         y.append(j)
     # plt.cla()
     #  linestyle=":", linewidth = 3,
-    plt.plot(y, avgRow, label = strat)
-    plt.ylim(-4, 4)
+    plt.plot(y, avgRow, linestyle=":", linewidth = 3, color = "black", label = "Average Line")
+    plt.ylim(-50, 50)
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 10000 games")
     plt.legend()
     # plt.axhline(y = 0, color = 'r', linestyle = '-') 
-    plt.savefig(f"allbetting500hands")
+    plt.savefig(f"mimicboldline")
 
 
 
@@ -674,7 +674,7 @@ def main_mimic(strat):
     win = 0
     push = 0
     loss = 0 
-    
+    potz = []
     results = []
     num = 100#int(input("How many hands: "))
     rows = []
@@ -705,7 +705,8 @@ def main_mimic(strat):
             elif result < 0:
                 loss += 1
             y.append(i)
-        # plt.plot(y, row)
+        potz.append(pot) 
+        plt.plot(y, row)
 
         rows.append(row)
     # plt.xlabel('Hand Number')
@@ -716,6 +717,7 @@ def main_mimic(strat):
 
     # Keep the final plot displayed
     # plt.show()
+    print("MEAN", sum(potz)/10000)
     averageRows(rows, strat)
     array = []
     for row in rows:
@@ -885,6 +887,7 @@ def create_multiple_decks(numDeck):
 def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     global running_count
     truecountseen = []
+    
     true_count_results = defaultdict(list)
 
     # decks = 6
@@ -893,7 +896,7 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     deck_all = []
     results = []
     bankrolls = []
-    hand_results = []
+    
     rows = []
     potss = []
     # results = []
@@ -906,6 +909,7 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     cut_card = decks*52*penetration
     num = 100#int(input("How many hands: "))
     avgprofitperhand = 0
+    hand_results = [[] for _ in range(num)]
     for k in range(10000):
         pots = []
         ruined = False
@@ -947,7 +951,7 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
             #print(f"CARDS LEFT: {len(deck)}")
             result = bs_blackjack(playerHand, dealerHand, deck, strategy, split, double) * bet
             true_count_results[int(true_count)].append(result)
-
+            hand_results[i].append(result)
             # bankroll += result
             pot += result
             pots.append(pot)
@@ -1005,6 +1009,10 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     print("True Count | Hands | Avg Profit | Win % | Push % | Loss %")
     print("-" * 60)
     
+    print("Hand means:", [np.mean(results) for results in hand_results])
+    print("Hand Standard dev:", [np.std(results) for results in hand_results])
+
+
     total_hands = 0
     total_profit = 0
     
@@ -1344,14 +1352,14 @@ def newPlot():
 
 choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
 if choice.lower() == "mimic":
-    main_mimic()
+    main_mimic("bleh")
 elif choice.lower() == "never":
     main_never_bust()
 elif choice.lower() == "basic":
     results = []
     labels = []
-    strats= ["Old Hi-Lo", "New Hi-Lo"]
-    names  = [1, 4]
+    strats= ["Hi-Lo"]
+    names  = [1]
     variants = [
         {"split": True, "double": True},
         {"split": False, "double": True},
