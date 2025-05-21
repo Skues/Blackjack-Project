@@ -1,4 +1,5 @@
 import random
+from collections import defaultdict
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -658,13 +659,13 @@ def averageRows(rows, strat):
     # plt.cla()
     #  linestyle=":", linewidth = 3,
     plt.plot(y, avgRow, label = strat)
-    plt.ylim(-2, 1)
+    plt.ylim(-4, 4)
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 10000 games")
     plt.legend()
     # plt.axhline(y = 0, color = 'r', linestyle = '-') 
-    plt.savefig(f"omega-betting-methods")
+    plt.savefig(f"allbetting500hands")
 
 
 
@@ -801,8 +802,12 @@ def get_bet(running_count, bet_type, deck):
             return 4, true_count
         elif true_count <= 3:
             return 6, true_count
-        else:
+        elif true_count <= 4:
             return 8, true_count
+        elif true_count <= 5:
+            return 10, true_count
+        else:
+            return 12, true_count
     elif bet_type == 2:
         if true_count <= 0:
             return 1, true_count
@@ -825,6 +830,47 @@ def get_bet(running_count, bet_type, deck):
             return 12, true_count
         else:
             return 16, true_count
+    elif bet_type == 4:
+        if true_count <= 0:
+            return 1, true_count
+        elif true_count <= 1:
+            return 2, true_count
+        elif true_count <= 2:
+            return 6, true_count
+        elif true_count <= 3:
+            return 12, true_count
+        elif true_count <= 4:
+            return 20, true_count
+        elif true_count <= 5:
+            return 30, true_count
+        else:
+            return 40, true_count
+    elif bet_type == 5:
+        if true_count <= 0:
+            return 1, true_count
+        elif true_count <= 1:
+            return 1, true_count
+        elif true_count <= 2:
+            return 12, true_count
+        elif true_count <= 3:
+            return 20, true_count
+        elif true_count <= 4:
+            return 30, true_count
+        else:
+            return 50, true_count
+    elif bet_type == 6:
+        if true_count <= 0:
+            return 1, true_count
+        elif true_count <= 1:
+            return 1, true_count
+        elif true_count <= 2:
+            return 16, true_count
+        elif true_count <= 3:
+            return 40, true_count
+        elif true_count <= 4:
+            return 60, true_count
+        else:
+            return 80, true_count
     
 def create_multiple_decks(numDeck):
     deck_all = []
@@ -835,10 +881,12 @@ def create_multiple_decks(numDeck):
     return flat_list
 
     
-    deck2 = random.shuffle(flat_list)
+
 def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     global running_count
     truecountseen = []
+    true_count_results = defaultdict(list)
+
     # decks = 6
     money = 0
     day_change = []
@@ -898,6 +946,8 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
 
             #print(f"CARDS LEFT: {len(deck)}")
             result = bs_blackjack(playerHand, dealerHand, deck, strategy, split, double) * bet
+            true_count_results[int(true_count)].append(result)
+
             # bankroll += result
             pot += result
             pots.append(pot)
@@ -951,6 +1001,43 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     #print(max(results))
 
     print(f"Standard deviation:{standard_dev}")
+    print("\nAnalysis by True Count:")
+    print("True Count | Hands | Avg Profit | Win % | Push % | Loss %")
+    print("-" * 60)
+    
+    total_hands = 0
+    total_profit = 0
+    
+    for tc in sorted(true_count_results.keys()):
+        count_results = true_count_results[tc]
+        hands = len(count_results)
+        total_hands += hands
+        
+        if hands > 0:
+            avg_profit = sum(count_results) / hands
+            total_profit += sum(count_results)
+            
+            wins = sum(1 for r in count_results if r > 0)
+            pushes = sum(1 for r in count_results if r == 0)
+            losses = sum(1 for r in count_results if r < 0)
+            
+            win_pct = wins / hands * 100
+            push_pct = pushes / hands * 100
+            loss_pct = losses / hands * 100
+            
+            print(f"{tc:9d} | {hands:5d} | {avg_profit:10.4f} | {win_pct:5.1f}% | {push_pct:5.1f}% | {loss_pct:5.1f}%")
+    
+    print("-" * 60)
+    print(f"Overall   | {total_hands:5d} | {total_profit/total_hands:10.4f}")
+
+    # plt.figure(figsize=(10, 6))
+    # plt.hist(results, bins=50, edgecolor='black')
+    # plt.title('Distribution of Profit per 100-Hand Game (10,000 Games)')
+    # plt.xlabel('Profit')
+    # plt.ylabel('Frequency')
+    # plt.grid(True)
+    # plt.tight_layout()
+    # plt.show()
     #print(f"Amount ruined: {ruin_count}")
     #print(f"Final money: {money}")
     
@@ -1263,8 +1350,8 @@ elif choice.lower() == "never":
 elif choice.lower() == "basic":
     results = []
     labels = []
-    strats= ["Flat Betting", "1-8", "1-12", "1-16"]
-    names  = [0, 1, 2, 3]
+    strats= ["Old Hi-Lo", "New Hi-Lo"]
+    names  = [1, 4]
     variants = [
         {"split": True, "double": True},
         {"split": False, "double": True},
@@ -1272,7 +1359,7 @@ elif choice.lower() == "basic":
         {"split": False, "double": False},
     ]
     for name, strat in zip(names, strats):
-        result = basic_strategy_main(name, "omega", 6, True, True, strat)
+        result = basic_strategy_main(name, "hilo", 6, True, True, strat)
         results.append(result)
         # labels.append(label)
     # mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic("Mimic")
