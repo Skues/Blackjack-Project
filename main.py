@@ -658,14 +658,14 @@ def averageRows(rows, strat):
         y.append(j)
     # plt.cla()
     #  linestyle=":", linewidth = 3,
-    plt.plot(y, avgRow, linestyle=":", linewidth = 3, color = "black", label = "Average Line")
-    plt.ylim(-50, 50)
+    plt.plot(y, avgRow, label = strat)
+    plt.ylim(-1, 10)
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 10000 games")
     plt.legend()
     # plt.axhline(y = 0, color = 'r', linestyle = '-') 
-    plt.savefig(f"mimicboldline")
+    plt.savefig(f"allcardszzzz")
 
 
 
@@ -804,12 +804,8 @@ def get_bet(running_count, bet_type, deck):
             return 4, true_count
         elif true_count <= 3:
             return 6, true_count
-        elif true_count <= 4:
-            return 8, true_count
-        elif true_count <= 5:
-            return 10, true_count
         else:
-            return 12, true_count
+            return 8, true_count
     elif bet_type == 2:
         if true_count <= 0:
             return 1, true_count
@@ -887,7 +883,7 @@ def create_multiple_decks(numDeck):
 def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     global running_count
     truecountseen = []
-    
+    shufflePoints = []
     true_count_results = defaultdict(list)
 
     # decks = 6
@@ -905,12 +901,14 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     push = 0
     loss = 0 
     ruin_count = 0
-    penetration = 0.75
+    penetration = 0.25
     cut_card = decks*52*penetration
+    print(cut_card)
     num = 100#int(input("How many hands: "))
     avgprofitperhand = 0
     hand_results = [[] for _ in range(num)]
     for k in range(10000):
+        shuffleGame= []
         pots = []
         ruined = False
         #money -= 100
@@ -923,6 +921,7 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
         
         # deck = shuffleDeck(createDeck())
         deck = create_multiple_decks(decks)
+        
         random.shuffle(deck)
         running_count = 0
         for i in range(num):
@@ -933,6 +932,7 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
                 # deck = shuffleDeck(createDeck())
                 deck = create_multiple_decks(decks)
                 random.shuffle(deck)
+                shuffleGame.append(i)
 
                 running_count = 0
             bet, true_count = get_bet(running_count, bet_type, deck)
@@ -966,6 +966,7 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
             elif result < 0:
                 loss += 1
             y.append(i)
+        shufflePoints.append(shuffleGame)
         # plt.plot(y, pots)
                 
         # if ruined:
@@ -988,7 +989,7 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     # Keep the final plot displayed
     # plt.show()
     avg_results = [r/100 for r in results]
-
+    # print("Shuffle Points:", shufflePoints)
     mean = sum(avg_results)/len(avg_results)
 
     squared_difference = [(r-mean)**2 for r in avg_results]
@@ -1005,12 +1006,12 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     #print(max(results))
 
     print(f"Standard deviation:{standard_dev}")
-    print("\nAnalysis by True Count:")
-    print("True Count | Hands | Avg Profit | Win % | Push % | Loss %")
-    print("-" * 60)
+    # print("\nAnalysis by True Count:")
+    # print("True Count | Hands | Avg Profit | Win % | Push % | Loss %")
+    # print("-" * 60)
     
-    print("Hand means:", [np.mean(results) for results in hand_results])
-    print("Hand Standard dev:", [np.std(results) for results in hand_results])
+    # print("Hand means:", [np.mean(results) for results in hand_results])
+    # print("Hand Standard dev:", [np.std(results) for results in hand_results])
 
 
     total_hands = 0
@@ -1035,8 +1036,8 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
             
             print(f"{tc:9d} | {hands:5d} | {avg_profit:10.4f} | {win_pct:5.1f}% | {push_pct:5.1f}% | {loss_pct:5.1f}%")
     
-    print("-" * 60)
-    print(f"Overall   | {total_hands:5d} | {total_profit/total_hands:10.4f}")
+    # print("-" * 60)
+    # print(f"Overall   | {total_hands:5d} | {total_profit/total_hands:10.4f}")
 
     # plt.figure(figsize=(10, 6))
     # plt.hist(results, bins=50, edgecolor='black')
@@ -1358,8 +1359,8 @@ elif choice.lower() == "never":
 elif choice.lower() == "basic":
     results = []
     labels = []
-    strats= ["Hi-Lo"]
-    names  = [1]
+    strats= ["Hi-Lo", "Omega II", "Wong Halves"]
+    names  = ["hilo", "omega", "wong"]
     variants = [
         {"split": True, "double": True},
         {"split": False, "double": True},
@@ -1367,7 +1368,7 @@ elif choice.lower() == "basic":
         {"split": False, "double": False},
     ]
     for name, strat in zip(names, strats):
-        result = basic_strategy_main(name, "hilo", 6, True, True, strat)
+        result = basic_strategy_main(1, name, 1, True, True, strat)
         results.append(result)
         # labels.append(label)
     # mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic("Mimic")
