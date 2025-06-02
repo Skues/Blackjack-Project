@@ -589,20 +589,19 @@ def bs_split(playerHand, dealerHand, shuffledDeck, strategy):
         if handValue(dealerHand) > 21:
             result1 = abs(result1)
         elif blackjackCheck(playerHand):
-            pass  # Keep blackjack payout
+            pass
         elif handValue(dealerHand) > handValue(playerHand):
             result1 = -1 * abs(result1)
         elif handValue(dealerHand) < handValue(playerHand):
             result1 = abs(result1)
         else:
-            result1 = 0  # Push
+            result1 = 0 
     
-    # Evaluate second hand result if it didn't bust
     if result2 >= 0:
         if handValue(dealerHand) > 21:
             result2 = abs(result2)
         elif blackjackCheck(playerHand2):
-            pass  # Keep blackjack payout
+            pass  
         elif handValue(dealerHand) > handValue(playerHand2):
             result2 = -1 * abs(result2)
         elif handValue(dealerHand) < handValue(playerHand2):
@@ -659,13 +658,14 @@ def averageRows(rows, strat):
     # plt.cla()
     #  linestyle=":", linewidth = 3,
     plt.plot(y, avgRow, label = strat)
-    plt.ylim(-1, 10)
+    plt.ylim(-1, 1)
     plt.xlabel("Hand #")
     plt.ylabel("Result")
     plt.title("Average of 100 hands and 10000 games")
     plt.legend()
     # plt.axhline(y = 0, color = 'r', linestyle = '-') 
-    plt.savefig(f"allcardszzzz")
+    plt.show()
+    # plt.savefig(f"detatat{strat}")
 
 
 
@@ -704,19 +704,22 @@ def main_mimic(strat):
                 win += 1
             elif result < 0:
                 loss += 1
+            
             y.append(i)
         potz.append(pot) 
         plt.plot(y, row)
+        plt.title('Pot Progression: Mimic the Dealer')
+        plt.xlabel('Hand Number')
+        plt.ylabel('Pot')
+        
 
         rows.append(row)
-    # plt.xlabel('Hand Number')
-    # plt.ylabel('Pot')
-    # plt.title('Pot Progression: Mimic the Dealer')
+    # 
 
     # plt.tight_layout()
 
     # Keep the final plot displayed
-    # plt.show()
+    plt.show()
     print("MEAN", sum(potz)/10000)
     averageRows(rows, strat)
     array = []
@@ -951,9 +954,10 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
             #print(f"CARDS LEFT: {len(deck)}")
             result = bs_blackjack(playerHand, dealerHand, deck, strategy, split, double) * bet
             true_count_results[int(true_count)].append(result)
-            hand_results[i].append(result)
             # bankroll += result
             pot += result
+            hand_results[i].append(pot)
+
             pots.append(pot)
             row.append(result)
             
@@ -1034,7 +1038,7 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
             push_pct = pushes / hands * 100
             loss_pct = losses / hands * 100
             
-            print(f"{tc:9d} | {hands:5d} | {avg_profit:10.4f} | {win_pct:5.1f}% | {push_pct:5.1f}% | {loss_pct:5.1f}%")
+            # print(f"{tc:9d} | {hands:5d} | {avg_profit:10.4f} | {win_pct:5.1f}% | {push_pct:5.1f}% | {loss_pct:5.1f}%")
     
     # print("-" * 60)
     # print(f"Overall   | {total_hands:5d} | {total_profit/total_hands:10.4f}")
@@ -1091,9 +1095,12 @@ def basic_strategy_main(bet_type, strategy, decks, split, double, strat):
     
     # print(f"Win rate: {win/10000} \n Push rate: {push/10000} \n Loss rate: {loss/10000}")
     # print(f"Avg. Profit per Hand: {(winnings-1000000)/1000000}")
+    hand_means = [np.mean(results) for results in hand_results]
+    hand_stdevs = [np.std(results) for results in hand_results]
+
     print(win / 10000, push / 10000, loss / 10000)
     print(truecountseen[0])
-    return( win / 1000000, push / 1000000, loss / 1000000, avgprofitperhand, standard_dev, day_change, truecountseen)
+    return(hand_means, hand_stdevs, win / 1000000, push / 1000000, loss / 1000000, avgprofitperhand, standard_dev, day_change, truecountseen)
 
 def plot_avgprofit_comparison(avgprofit_list, strategies):
     betting_labels = ["Betting 1", "Betting 2", "Betting 3", "Betting 4"]
@@ -1101,10 +1108,8 @@ def plot_avgprofit_comparison(avgprofit_list, strategies):
     num_strats = len(strategies)
     bar_width = 0.2
 
-    # X-axis positions for each group of bars
     x = np.arange(num_bets)
 
-    # Create a bar for each strategy
     plt.figure(figsize=(12, 6))
     for i, (avgprofits, strategy) in enumerate(zip(avgprofit_list, strategies)):
         offset = (i - (num_strats - 1)/2) * bar_width  # centers the bars
@@ -1146,7 +1151,6 @@ def loop_basic():
     betting_labels = ["Betting 1", "Betting 2", "Betting 3"]
     bar_width = 0.25
     
-    # Set up the figure with appropriate size
     fig, axs = plt.subplots(3, 1, figsize=(10, 15))
     titles = ["Win Rates", "Push Rates", "Loss Rates"]
 
@@ -1187,10 +1191,8 @@ def loop_basic():
         formatted = [f"{x:.6f}" for x in rateruin]
         print(f"Strategy: {strategy} \n Rate of ruin: {formatted}")
 
-    # Create a more informative visualization
     fig, axs = plt.subplots(2, 2, figsize=(16, 12))
     
-    # 1. Stacked bar chart showing win/push/loss composition for each strategy-betting combo
     ax = axs[0, 0]
     
     
@@ -1219,31 +1221,25 @@ def loop_basic():
     ax.set_title('Daily Money Changes Over Time')
     ax.set_xlabel('Day')
     ax.set_ylabel('Money Won/Lost')
-    ax.axhline(y=0, color='r', linestyle='-', alpha=0.3)  # Zero line
+    ax.axhline(y=0, color='r', linestyle='-', alpha=0.3) 
     ax.legend()
     
-    # 2. Heatmap of win rates
     ax = axs[0, 1]
     win_array = np.array(win_rates)
     im = ax.imshow(win_array, cmap='YlGn')
     
-    # Add labels
     ax.set_xticks(np.arange(len(betting_labels)))
     ax.set_yticks(np.arange(len(strategies)))
     ax.set_xticklabels(betting_labels)
     ax.set_yticklabels(strategies)
     ax.set_title('Win Rate Heatmap')
     
-    # Add colorbar
     ax.figure.colorbar(im, ax=ax)
     
-    # 3. Average profit comparison
     ax = axs[1, 0]
     x = np.arange(len(betting_labels))
     width = 0.25
-    
-    
-    # 4. Ruin rate comparison
+
     ax = axs[1, 1]
     x = np.arange(len(betting_labels))
     width = 0.25
@@ -1261,7 +1257,6 @@ def loop_basic():
     plt.show()
     
     
-    # Find and print the best and worst combinations
     win_array = np.array(win_rates)
     loss_array = np.array(loss_rates)
     profit_array = np.array(avgprofit_list)
@@ -1351,47 +1346,59 @@ def newPlot():
 
     plt.show()
 
+def stdGraph():
+    result = basic_strategy_main(3, "hilo", 6, True, True, "Bleh")
+    
+    print(f"Number of return values: {len(result)}")
+    print(f"Types of return values: {[type(x) for x in result]}")
+    
+    if len(result) < 9:
+        print("Error: basic_strategy_main is not returning hand_means and hand_stdevs")
+        print("Make sure you modified the return statement in basic_strategy_main")
+        return
+    
+    hand_means, hand_stdevs, _, _, _, _, _, _, _, = result
+    
+    print(f"hand_means length: {len(hand_means)}")
+    print(f"hand_stdevs length: {len(hand_stdevs)}")
+    print(f"First few hand_means: {hand_means[:5]}")
+    
+    if len(hand_means) != 100:
+        print(f"Error: Expected 100 hand means, got {len(hand_means)}")
+        return
+    
+    hand_means = np.array(hand_means)
+    hand_stdevs = np.array(hand_stdevs)
+    
+    n_games = 10000
+    hand_standard_errors = hand_stdevs / np.sqrt(n_games)
+    
+    hand_numbers = range(1, 101)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(hand_numbers, hand_means, label="Mean Profit", color='blue')
+    plt.fill_between(
+        hand_numbers,
+        hand_means - hand_standard_errors,
+        hand_means + hand_standard_errors,
+        alpha=0.3,
+        label="±1 Standard Error",
+    )
+    plt.xlabel("Hand #")
+    plt.ylabel("Cumulative Profit")
+    plt.title("Average profit per hand with Standard Error (10,000 Games)")
+    plt.legend()
+    plt.grid(True)
+    plt.axhline(y=0, color='red', linestyle='--', alpha=0.5)
+    plt.show()
+
 choice = input("Normal, Mimic The Dealer, Never Bust or Basic Strategy? ")
 if choice.lower() == "mimic":
     main_mimic("bleh")
 elif choice.lower() == "never":
     main_never_bust()
 elif choice.lower() == "basic":
-    results = []
-    labels = []
-    strats= ["Hi-Lo", "Omega II", "Wong Halves"]
-    names  = ["hilo", "omega", "wong"]
-    variants = [
-        {"split": True, "double": True},
-        {"split": False, "double": True},
-        {"split": True, "double": False},
-        {"split": False, "double": False},
-    ]
-    for name, strat in zip(names, strats):
-        result = basic_strategy_main(1, name, 1, True, True, strat)
-        results.append(result)
-        # labels.append(label)
-    # mimic_wr, mimic_pr, mimic_lr, mimic_avgprofit = main_mimic("Mimic")
-    # neverb_wr, neverb_pr, neverb_lr, neverb_avgprofit = main_never_bust("NeverB")
-    # basic_strategy_main(0, "hilo", 1)
-
-    # avgprofits = []
-    # standarddevs = []
-    
-    # for j in ["hilo", "omega", "wong"]:
-    #     avgp = []
-    #     std = []
-    #     for i in [1, 2, 3]:
-    #         hand_results = basic_strategy_main(i, j, 6)
-    #         avgp.append(hand_results[-4])
-    #         std.append(hand_results[-3])
-    #     avgprofits.append(avgp)
-    #     standarddevs.append(std)
-    # print(avgprofits)
-    # print(standarddevs)
-
-
-
+    basic_strategy_main(0, "hilo", 1, True, True, "Null")
 elif choice.lower() == "normal":
     blackjack()
 elif choice.lower() == "loop":
@@ -1404,5 +1411,20 @@ elif choice.lower() == "plot":
     plotting()
 elif choice.lower() == "new":
     newPlot()
-
+elif choice.lower() == "std":
+    stdGraph()
+elif choice.lower() == "extra":
+    results = []
+    labels = []
+    strats= ["1 Deck", "2 Decks", "4 Decks", "6 Decks"]
+    names  = [1, 2, 4, 6]
+    variants = [
+        {"split": True, "double": True},
+        {"split": False, "double": True},
+        {"split": True, "double": False},
+        {"split": False, "double": False},
+    ]
+    for name, strat in zip(names, strats):
+        result = basic_strategy_main(1, "wong", name, True, True, strat)
+        results.append(result)
 
