@@ -1,6 +1,6 @@
 # Third Year Final Project - Blackjack Card Counting 🃏
 
-This project was my chosen dissertation and, along with the code, has a 40 page report
+This project was my chosen dissertation and, along with the code, has a [40 page report](https://github.com/Skues/Blackjack-Project/blob/main/Blackjack%20Report.pdf)
 on my findings and evaluation. The aim of this project was to create a Blackjack simulation that investigates
 the effectiveness of various strategies within games of Blackjack.
 Each strategy was simulated over 10,000 games to generate reliable long-term results.
